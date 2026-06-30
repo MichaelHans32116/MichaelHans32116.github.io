@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portfolio of Michael Hans G. Magbojos, BSIT student, DOST-SEI scholar, software developer, and AI response evaluation candidate.">
+  <meta name="theme-color" content="#f8fafc">
+  <title>Michael Hans Magbojos | Software Developer & AI Evaluator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Michael Hans Magbojos home">
+      <span class="brand-mark">MH</span>
+      <span>Michael Hans</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+      <i data-lucide="menu"></i>
+    </button>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="#work">Work</a>
+      <a href="#ai-fit">AI Fit</a>
+      <a href="#contributions">Contributions</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero section-shell">
+      <div class="hero-copy">
+        <p class="eyebrow">BSIT Student / DOST-SEI Scholar / Software Developer / AI Data Training Fit</p>
+        <h1>Building practical systems and evaluating AI responses with clear logic.</h1>
+        <p class="hero-text">
+          I am Michael Hans G. Magbojos, a software developer focused on full-stack systems,
+          database-backed workflows, Java problem solving, and careful AI response review.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#work">
+            <i data-lucide="folder-kanban"></i>
+            View projects
+          </a>
+          <a class="button secondary" href="mailto:s2023101036@firstasia.edu.ph">
+            <i data-lucide="send"></i>
+            Contact me
+          </a>
+        </div>
+        <div class="hero-points" aria-label="Profile highlights">
+          <span>6th place ISITE CodeChum</span>
+          <span>Perfect Java score</span>
+          <span>AI response evaluation ready</span>
+        </div>
+      </div>
+      <div class="hero-visual" aria-label="Profile image and quick profile">
+        <img src="assets/michael-hans-avatar.jpg" alt="Michael Hans Magbojos GitHub profile photo">
+        <div class="profile-note">
+          <strong>Currently focused on</strong>
+          <span>Software systems, debugging, AI data training tasks, and clear technical feedback.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="about section-band">
+      <div class="section-shell about-grid">
+        <div>
+          <p class="eyebrow">About</p>
+          <h2>Detail-oriented developer with competition-tested reasoning.</h2>
+        </div>
+        <div class="about-copy">
+          <p>
+            My work combines Java and algorithmic problem solving with backend development,
+            database design, and frontend collaboration. I have led school and client-based
+            projects, built SQL-backed workflows, and helped debug production-style web apps.
+            That same attention to correctness helps me evaluate AI-generated answers,
+            spot weak reasoning, and write useful feedback.
+          </p>
+          <div class="stats-grid">
+            <div>
+              <strong>2023-2026</strong>
+              <span>BSIT, FAITH Colleges</span>
+            </div>
+            <div>
+              <strong>5x</strong>
+              <span>President's Lister</span>
+            </div>
+            <div>
+              <strong>DOST-SEI</strong>
+              <span>Undergraduate Scholar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ai-fit" class="section-shell ai-fit">
+      <div class="section-heading">
+        <p class="eyebrow">AI Data Training Fit</p>
+        <h2>Why I fit AI response evaluation and annotation work.</h2>
+      </div>
+      <div class="ai-grid">
+        <div class="ai-card">
+          <i data-lucide="brain-circuit"></i>
+          <h3>Reasoning review</h3>
+          <p>
+            I can compare answers for correctness, completeness, and step-by-step logic,
+            especially in programming, math, debugging, and technical explanations.
+          </p>
+        </div>
+        <div class="ai-card">
+          <i data-lucide="clipboard-check"></i>
+          <h3>Rubric-based judgment</h3>
+          <p>
+            Competitive programming and school project work trained me to follow constraints,
+            test edge cases, and judge output against clear requirements.
+          </p>
+        </div>
+        <div class="ai-card">
+          <i data-lucide="message-square-text"></i>
+          <h3>Clear feedback</h3>
+          <p>
+            I explain what is wrong, why it matters, and how to improve it in practical,
+            readable language for both code and general response quality.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="work" class="section-shell">
+      <div class="section-heading">
+        <p class="eyebrow">Featured Work</p>
+        <h2>Main builds and selected collaborations, with roles made clear.</h2>
+      </div>
+      <div class="filter-bar" aria-label="Project filters">
+        <button class="filter-button active" type="button" data-filter="all">All</button>
+        <button class="filter-button" type="button" data-filter="author">Author</button>
+        <button class="filter-button" type="button" data-filter="coauthor">Co-author</button>
+        <button class="filter-button" type="button" data-filter="qa">QA</button>
+        <button class="filter-button" type="button" data-filter="system">Systems</button>
+        <button class="filter-button" type="button" data-filter="web">Web</button>
+        <button class="filter-button" type="button" data-filter="mobile">Mobile</button>
+      </div>
+
+      <div class="project-grid">
+        <article class="project-card" data-category="author system web">
+          <img src="assets/projects/gatepass-system.png" alt="GatePass System login screen">
+          <div class="project-card-body">
+            <div class="project-meta">
+              <span>Author / primary build</span>
+              <span>Internal workflow system</span>
+              <span>C# / .NET 8 / MariaDB</span>
+            </div>
+            <h3>GatePass System</h3>
+            <p>
+              Form request and approval workflow for person and material gate passes,
+              including QR time out/time in, fleet scheduling, role-based approvals,
+              and database-backed audit flow.
+            </p>
+            <div class="project-links">
+              <span class="private-note">Private repo</span>
+              <span class="private-note">Case study ready</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" data-category="author web mobile system">
+          <img src="assets/projects/howconnect-web.png" alt="HowConnect web login screen">
+          <div class="project-card-body">
+            <div class="project-meta">
+              <span>Author / project manager</span>
+              <span>React Native / C# / SQL Server</span>
+            </div>
+            <h3>HowConnect Web & App</h3>
+            <p>
+              Authored the web and app versions with project-management ownership,
+              database architecture, backend infrastructure, and responsive interface work.
+            </p>
+            <div class="project-links">
+              <a href="https://how-connect-web.vercel.app/" target="_blank" rel="noreferrer">
+                <i data-lucide="external-link"></i>
+                Website
+              </a>
+              <a href="https://expo.dev/accounts/hans32116/projects/how-connect-expo/builds/e995fbdd-1ec3-4ad2-9504-3b8e273fc271" target="_blank" rel="noreferrer">
+                <i data-lucide="smartphone"></i>
+                App build
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card text-project-card" data-category="author system">
+          <div class="project-card-icon">
+            <i data-lucide="bug"></i>
+          </div>
+          <div class="project-card-body">
+            <div class="project-meta">
+              <span>Author / primary build</span>
+              <span>Case study</span>
+            </div>
+            <h3>Insectra</h3>
+            <p>
+              Primary authored project. Full public case details can be added once the
+              repo, screenshots, or demo are safe to publish.
+            </p>
+            <div class="project-links">
+              <span class="private-note">Author project</span>
+              <span class="private-note">Details pending</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" data-category="coauthor web">
+          <img src="assets/projects/salinlahi.png" alt="Salinlahi login screen">
+          <div class="project-card-body">
+            <div class="project-meta">
+              <span>Co-author</span>
+              <span>Logic / frontend fixes</span>
+            </div>
+            <h3>Salinlahi</h3>
+            <p>
+              Co-authored project where I handled logic fixes, frontend improvements,
+              and related implementation support for the aid-tracking workflow.
+            </p>
+            <div class="project-links">
+              <a href="https://salinlahi-eight.vercel.app/" target="_blank" rel="noreferrer">
+                <i data-lucide="external-link"></i>
+                Live site
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" data-category="coauthor web system">
+          <img src="assets/projects/gabay-halam.png" alt="Gabay Halaman plant nursery website">
+          <div class="project-card-body">
+            <div class="project-meta">
+              <span>Co-author</span>
+              <span>Backend / database execution</span>
+            </div>
+            <h3>Gabay Halaman</h3>
+            <p>
+              Co-authored backend and database execution work, including Azure-related
+              setup/support for the plant nursery website.
+            </p>
+            <div class="project-links">
+              <a href="https://gabay-halam.vercel.app/" target="_blank" rel="noreferrer">
+                <i data-lucide="external-link"></i>
+                Live site
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" data-category="coauthor web system">
+          <img src="assets/projects/starqueen-web.png" alt="StarQueen login screen">
+          <div class="project-card-body">
+            <div class="project-meta">
+              <span>Co-author</span>
+              <span>Backend / database execution</span>
+            </div>
+            <h3>StarQueen Web</h3>
+            <p>
+              Co-authored backend and database execution support, including Azure-related
+              setup for the planned maintenance and tracking system.
+            </p>
+            <div class="project-links">
+              <a href="https://starqueen-web.vercel.app/" target="_blank" rel="noreferrer">
+                <i data-lucide="external-link"></i>
+                Live site
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card" data-category="qa mobile">
+          <img src="assets/projects/hanaplokal.png" alt="HanapLokal mobile-style community market screen">
+          <div class="project-card-body">
+            <div class="project-meta">
+              <span>Community market app</span>
+              <span>QA / bug hunting</span>
+            </div>
+            <h3>HanapLokal</h3>
+            <p>
+              Quality-check support only. I helped find bugs and review behavior for
+              a local community market experience; this is not a primary build.
+            </p>
+            <div class="project-links">
+              <a href="https://hanaplokal.vercel.app/" target="_blank" rel="noreferrer">
+                <i data-lucide="external-link"></i>
+                Live app
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="contributions" class="section-band">
+      <div class="section-shell contribution-layout">
+        <div>
+          <p class="eyebrow">Contribution Trail</p>
+          <h2>Two GitHub accounts, one work story.</h2>
+          <p>
+            My main public profile is <a href="https://github.com/MichaelHans32116" target="_blank" rel="noreferrer">@MichaelHans32116</a>.
+            Some debugging, experiments, and app builds also appear through
+            <a href="https://github.com/hans32116" target="_blank" rel="noreferrer">@hans32116</a>,
+            which I use for Pro/debug workflows. This portfolio connects both so the work is easier to review.
+          </p>
+        </div>
+        <div class="timeline">
+          <div>
+            <span>Main GitHub</span>
+            <strong>Repositories, school projects, and portfolio-ready work.</strong>
+          </div>
+          <div>
+            <span>Alt/debug GitHub</span>
+            <strong>Debugging sessions, app builds, and experimental pushes.</strong>
+          </div>
+          <div>
+            <span>Portfolio layer</span>
+            <strong>Selected contributions are documented here even when they cannot be pinned.</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="section-shell skills-section">
+      <div class="section-heading">
+        <p class="eyebrow">Skills</p>
+        <h2>Strongest tools and working habits.</h2>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-block">
+          <i data-lucide="braces"></i>
+          <h3>Programming</h3>
+          <p>Java, C++, Python, C#, JavaScript, HTML, CSS</p>
+        </div>
+        <div class="skill-block">
+          <i data-lucide="database"></i>
+          <h3>Backend and Data</h3>
+          <p>.NET 8, MySQL, SQL Server, database design, API contracts</p>
+        </div>
+        <div class="skill-block">
+          <i data-lucide="bug"></i>
+          <h3>Debugging</h3>
+          <p>Code analysis, bug tracing, workflow testing, batch scripting</p>
+        </div>
+        <div class="skill-block">
+          <i data-lucide="users"></i>
+          <h3>Leadership</h3>
+          <p>Project management, team coordination, full-stack collaboration</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-shell other-work">
+      <div class="section-heading">
+        <p class="eyebrow">More Work</p>
+        <h2>Other projects and collaborations to keep visible.</h2>
+      </div>
+      <div class="other-list">
+        <a href="https://adv-stat-finals.vercel.app/" target="_blank" rel="noreferrer">
+          <span>ADVSTAT Regression Tool</span>
+          <strong>Author - small statistics/calculator tool</strong>
+        </a>
+        <div>
+          <span>Calphy Calculator</span>
+          <strong>Co-author - calculator project</strong>
+        </div>
+        <div>
+          <span>GradeApp</span>
+          <strong>Co-author - Alextotell as main author, pinned/co-authored</strong>
+        </div>
+        <a href="https://terrasync-phi.vercel.app/" target="_blank" rel="noreferrer">
+          <span>TerraSync</span>
+          <strong>Co-authored school project</strong>
+        </a>
+        <a href="https://github.com/MichaelHans32116/Real-Time-Strategy-Game-w-AI-tools" target="_blank" rel="noreferrer">
+          <span>Real-Time Strategy Game w/ AI Tools</span>
+          <strong>HTML project</strong>
+        </a>
+        <a href="https://github.com/MichaelHans32116/Rock-Paper-Scissor-Real" target="_blank" rel="noreferrer">
+          <span>Rock Paper Scissor Real</span>
+          <strong>Browser game</strong>
+        </a>
+        <a href="https://japanese-occupation.vercel.app/" target="_blank" rel="noreferrer">
+          <span>Japanese Occupation</span>
+          <strong>History web project</strong>
+        </a>
+      </div>
+    </section>
+
+    <section id="contact" class="contact section-band">
+      <div class="section-shell contact-grid">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2>Let's build something useful.</h2>
+          <p>
+            I am open to internships, junior developer roles, AI data annotation/evaluation work,
+            school collaborations, and practical systems that need careful debugging and implementation.
+          </p>
+        </div>
+        <div class="contact-actions">
+          <a class="button primary" href="mailto:s2023101036@firstasia.edu.ph">
+            <i data-lucide="mail"></i>
+            s2023101036@firstasia.edu.ph
+          </a>
+          <button class="button secondary copy-email" type="button" data-email="s2023101036@firstasia.edu.ph">
+            <i data-lucide="copy"></i>
+            Copy email
+          </button>
+          <a class="button secondary" href="https://github.com/MichaelHans32116" target="_blank" rel="noreferrer">
+            <i data-lucide="github"></i>
+            GitHub profile
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Michael Hans G. Magbojos</span>
+    <span>Built for GitHub Pages</span>
+  </footer>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
