@@ -247,40 +247,16 @@ h3 {
 .hero-visual {
   position: relative;
   justify-self: end;
-  width: min(380px, 100%);
+  width: min(340px, 100%);
 }
 
 .hero-visual img {
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 8px solid #ffffff;
+  border-radius: 50%;
   box-shadow: var(--shadow);
-}
-
-.profile-note {
-  position: absolute;
-  right: -18px;
-  bottom: 22px;
-  width: min(260px, 80%);
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-}
-
-.profile-note strong,
-.profile-note span {
-  display: block;
-}
-
-.profile-note span {
-  margin-top: 6px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
 }
 
 .about,
@@ -346,7 +322,6 @@ h3 {
 }
 
 #work,
-.ai-fit,
 .skills-section,
 .other-work {
   padding: 76px 0;
@@ -389,33 +364,6 @@ h3 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-}
-
-.ai-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.ai-card {
-  padding: 22px;
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
-}
-
-.ai-card svg {
-  width: 30px;
-  height: 30px;
-  margin-bottom: 18px;
-  color: var(--blue);
-}
-
-.ai-card p {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.65;
 }
 
 .project-card {
@@ -647,7 +595,6 @@ h3 {
   }
 
   .project-grid,
-  .ai-grid,
   .skills-grid,
   .other-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -723,15 +670,8 @@ h3 {
     justify-content: center;
   }
 
-  .profile-note {
-    position: static;
-    width: 100%;
-    margin-top: 12px;
-  }
-
   .stats-grid,
   .project-grid,
-  .ai-grid,
   .skills-grid,
   .other-list {
     grid-template-columns: 1fr;
