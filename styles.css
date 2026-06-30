@@ -535,6 +535,32 @@ h3 {
   border-radius: 8px;
 }
 
+.other-list .preview-work {
+  min-height: 210px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.preview-work img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-bottom: 1px solid var(--line);
+}
+
+.preview-work span,
+.preview-work strong {
+  margin-inline: 16px;
+}
+
+.preview-work span {
+  margin-top: 14px;
+}
+
+.preview-work strong {
+  margin-bottom: 16px;
+}
+
 .other-list a:hover,
 .other-list a:focus-visible {
   border-color: var(--blue);
