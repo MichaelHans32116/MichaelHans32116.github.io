@@ -453,6 +453,10 @@ h3 {
   font-weight: 800;
 }
 
+.project-links a:hover {
+  text-decoration: underline;
+}
+
 .private-note {
   color: var(--amber);
   background: #fff7ed;
@@ -522,8 +526,8 @@ h3 {
   gap: 12px;
 }
 
-.other-list a,
-.other-list div {
+.other-list > a,
+.other-card {
   display: flex;
   min-height: 86px;
   flex-direction: column;
@@ -533,12 +537,21 @@ h3 {
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 8px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .other-list .preview-work {
-  min-height: 210px;
+  min-height: 280px;
   padding: 0;
   overflow: hidden;
+}
+
+.other-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
 }
 
 .preview-work img {
@@ -548,21 +561,10 @@ h3 {
   border-bottom: 1px solid var(--line);
 }
 
-.preview-work span,
-.preview-work strong {
-  margin-inline: 16px;
-}
-
-.preview-work span {
-  margin-top: 14px;
-}
-
-.preview-work strong {
-  margin-bottom: 16px;
-}
-
-.other-list a:hover,
-.other-list a:focus-visible {
+.other-list > a:hover,
+.other-list > a:focus-visible,
+.other-card:hover,
+.other-card:focus-within {
   border-color: var(--blue);
   outline: none;
 }
@@ -574,6 +576,17 @@ h3 {
 .other-list strong {
   color: var(--muted);
   font-size: 13px;
+}
+
+.mini-links {
+  margin-top: auto;
+}
+
+.mini-links a {
+  padding: 0;
+  color: var(--blue);
+  background: transparent;
+  border: 0;
 }
 
 .contact-actions {
