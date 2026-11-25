@@ -391,6 +391,93 @@ h3 {
   border-bottom: 1px solid var(--line);
 }
 
+.project-card-logo {
+  display: grid;
+  aspect-ratio: 16 / 9;
+  place-items: center;
+  padding: 20px;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(15, 118, 110, 0.08)),
+    #ffffff;
+  border-bottom: 1px solid var(--line);
+}
+
+.project-card .project-card-logo img {
+  width: auto;
+  max-width: 72%;
+  max-height: 118px;
+  aspect-ratio: auto;
+  object-fit: contain;
+  border-bottom: 0;
+}
+
+.experience-band {
+  padding: 76px 0;
+}
+
+.experience-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.experience-card {
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+.experience-card ul {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.experience-card li + li {
+  margin-top: 8px;
+}
+
+.credentials-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.credential-card {
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.credential-card span {
+  display: block;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.credential-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.credential-card p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
 .text-project-card {
   display: flex;
   flex-direction: column;
@@ -503,7 +590,7 @@ h3 {
 
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -635,6 +722,7 @@ h3 {
 
   .project-grid,
   .skills-grid,
+  .credentials-grid,
   .other-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -710,6 +798,8 @@ h3 {
   }
 
   .stats-grid,
+  .experience-grid,
+  .credentials-grid,
   .project-grid,
   .skills-grid,
   .other-list {
