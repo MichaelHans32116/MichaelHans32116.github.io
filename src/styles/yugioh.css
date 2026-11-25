@@ -1,0 +1,262 @@
+@import "tailwindcss";
+
+:root {
+  --bg-obsidian: #08090c;
+  --bg-mat: #0d1016;
+  --bg-panel: #12161f;
+  --gold-bright: #f3da8b;
+  --gold-main: #d4af37;
+  --gold-dim: #8a6e28;
+  --steel-blue: #4ea8de;
+  --spell-teal: #1d9a78;
+  --trap-crimson: #b83b5e;
+  --text-primary: #eceef2;
+  --text-muted: #98a2b3;
+  --border-hairline: rgba(212, 175, 55, 0.18);
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+    background-color: var(--bg-obsidian);
+    color: var(--text-primary);
+  }
+
+  body {
+    overflow-x: hidden;
+    background-color: var(--bg-obsidian);
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono-tech {
+  font-family: var(--font-mono);
+}
+
+/* Static etched Duel Mat backdrop (zero JS animation loop -> 60fps always) */
+.duel-mat-bg {
+  background-color: var(--bg-obsidian);
+  background-image:
+    radial-gradient(ellipse 80% 55% at 50% 0%, rgba(212, 175, 55, 0.065), transparent 68%),
+    radial-gradient(ellipse 65% 45% at 85% 85%, rgba(78, 168, 222, 0.05), transparent 65%),
+    linear-gradient(rgba(212, 175, 55, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 175, 55, 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 56px 56px, 56px 56px;
+}
+
+/* 3D Perspective & Card Physics */
+.ygo-stage {
+  perspective: 1400px;
+}
+
+.ygo-card-tilt {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --holo-opacity: 0;
+  --parallax-x: 0px;
+  --parallax-y: 0px;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rotate-x)) rotateY(var(--rotate-y));
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
+  will-change: transform;
+}
+
+.ygo-card-tilt[data-interacting='true'] {
+  transition: transform 55ms linear, box-shadow 180ms ease;
+}
+
+.ygo-flipper {
+  transform-style: preserve-3d;
+  transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ygo-flipper[data-flipped='true'] {
+  transform: rotateY(180deg);
+}
+
+.ygo-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.ygo-face-back {
+  transform: rotateY(180deg);
+}
+
+/* Authentic refined Yu-Gi-Oh Frame Skins (matte collector finish, zero neon slop) */
+.ygo-frame-ACE {
+  background: linear-gradient(148deg, #272115 0%, #161412 42%, #241c10 74%, #101218 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.65);
+  box-shadow:
+    inset 0 0 0 3px #0c0e13,
+    inset 0 0 0 4.5px rgba(212, 175, 55, 0.36),
+    0 22px 50px -18px rgba(0, 0, 0, 0.85),
+    0 0 32px -12px rgba(212, 175, 55, 0.22);
+}
+
+.ygo-frame-LINK {
+  background: linear-gradient(150deg, #102542 0%, #0b182c 52%, #132c4f 100%);
+  border: 1.5px solid rgba(93, 177, 232, 0.55);
+  box-shadow:
+    inset 0 0 0 3px #0a0f18,
+    inset 0 0 0 4.5px rgba(212, 175, 55, 0.32),
+    0 20px 44px -18px rgba(0, 0, 0, 0.85);
+}
+
+.ygo-frame-SYNCHRO {
+  background: linear-gradient(150deg, #2a2e38 0%, #1c2028 48%, #313643 100%);
+  border: 1.5px solid rgba(226, 232, 240, 0.45);
+  box-shadow:
+    inset 0 0 0 3px #101319,
+    inset 0 0 0 4.5px rgba(212, 175, 55, 0.28),
+    0 20px 44px -18px rgba(0, 0, 0, 0.85);
+}
+
+.ygo-frame-XYZ {
+  background: linear-gradient(150deg, #15171c 0%, #0b0c10 55%, #191d24 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.52);
+  box-shadow:
+    inset 0 0 0 3px #07080a,
+    inset 0 0 0 4.5px rgba(29, 154, 120, 0.32),
+    0 20px 44px -18px rgba(0, 0, 0, 0.88);
+}
+
+.ygo-frame-FUSION {
+  background: linear-gradient(150deg, #251934 0%, #161121 55%, #2b1d3d 100%);
+  border: 1.5px solid rgba(196, 165, 224, 0.42);
+  box-shadow:
+    inset 0 0 0 3px #0e0b14,
+    inset 0 0 0 4.5px rgba(212, 175, 55, 0.28),
+    0 20px 44px -18px rgba(0, 0, 0, 0.85);
+}
+
+.ygo-frame-EFFECT {
+  background: linear-gradient(150deg, #2c2015 0%, #1a140f 55%, #2e2217 100%);
+  border: 1.5px solid rgba(208, 159, 96, 0.46);
+  box-shadow:
+    inset 0 0 0 3px #100d0a,
+    inset 0 0 0 4.5px rgba(212, 175, 55, 0.24),
+    0 18px 38px -16px rgba(0, 0, 0, 0.82);
+}
+
+/* Secret Rare / Prismatic Foil Glare Layer (Simey-inspired, active only on interaction) */
+.ygo-holo-foil {
+  pointer-events: none;
+  opacity: var(--holo-opacity);
+  transition: opacity 220ms ease;
+  background-image:
+    repeating-linear-gradient(
+      125deg,
+      rgba(212, 175, 55, 0) 0%,
+      rgba(243, 218, 139, 0.16) 6%,
+      rgba(78, 168, 222, 0.14) 12%,
+      rgba(243, 218, 139, 0.08) 18%,
+      rgba(212, 175, 55, 0) 24%
+    ),
+    radial-gradient(
+      circle at var(--pointer-x) var(--pointer-y),
+      rgba(255, 246, 214, 0.32) 0%,
+      rgba(212, 175, 55, 0.14) 24%,
+      rgba(78, 168, 222, 0.08) 46%,
+      transparent 72%
+    );
+  background-position: var(--pointer-x) var(--pointer-y);
+  background-size: 200% 200%, 100% 100%;
+  mix-blend-mode: color-dodge;
+}
+
+/* Subtle metallic specular sweep on the artwork frame */
+.ygo-art-glint {
+  pointer-events: none;
+  opacity: calc(var(--holo-opacity) * 0.78);
+  transition: opacity 220ms ease;
+  background: radial-gradient(
+    ellipse 55% 45% at var(--pointer-x) var(--pointer-y),
+    rgba(255, 250, 232, 0.24),
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+}
+
+/* 3D Shadowbox Parallax layers for Hans's real transparent cutout */
+.shadowbox-bg-layer {
+  transform: translate3d(calc(var(--parallax-x) * -0.9), calc(var(--parallax-y) * -0.9), 0) scale(1.08);
+  transition: transform 90ms linear;
+}
+
+.shadowbox-subject-layer {
+  transform: translate3d(calc(var(--parallax-x) * 0.85), calc(var(--parallax-y) * 0.65), 0) scale(1.02);
+  transition: transform 90ms linear;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.72)) contrast(1.03) saturate(1.02);
+}
+
+/* Stacked 3D Main Deck styling */
+.deck-stack-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(212, 175, 55, 0.34);
+  background: #0d1016;
+}
+
+/* Subtle gold pulse for deck callout */
+@keyframes deckRimPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.4), 0 18px 36px -12px rgba(0, 0, 0, 0.85), 0 0 24px -6px rgba(212, 175, 55, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 1.5px rgba(243, 218, 139, 0.8), 0 22px 44px -10px rgba(0, 0, 0, 0.9), 0 0 36px -4px rgba(212, 175, 55, 0.42);
+  }
+}
+
+.deck-top-pulse {
+  animation: deckRimPulse 2.8s ease-in-out infinite;
+}
+
+/* Draw-phase flash burst */
+.draw-flash-sweep {
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(243, 218, 139, 0.55) 48%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(243, 218, 139, 0.45) 52%,
+    transparent 80%
+  );
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #08090c;
+}
+::-webkit-scrollbar-thumb {
+  background: #232836;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8a6e28;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ygo-card-tilt,
+  .ygo-flipper,
+  .shadowbox-bg-layer,
+  .shadowbox-subject-layer,
+  .deck-top-pulse {
+    animation: none !important;
+    transition: none !important;
+  }
+}
