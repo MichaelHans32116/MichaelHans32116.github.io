@@ -75,7 +75,7 @@ export const HoloYugiohCard: React.FC<HoloYugiohCardProps> = ({
             handleClick()
           }
         }}
-        aria-label={flippable ? 'Michael Hans Magbojos card — click to flip' : 'Michael Hans Magbojos card'}
+        aria-label={flippable ? 'Michael Hans Magbojos card, click to flip' : 'Michael Hans Magbojos card'}
         className={`holo-card relative aspect-[59/86] w-full select-none ${
           flippable ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-silver)]' : ''
         }`}

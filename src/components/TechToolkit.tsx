@@ -213,20 +213,20 @@ const TOOLKIT_ROWS: ToolkitRow[] = [
 
 export const TechToolkit: React.FC = () => {
   return (
-    <section className="space-y-6">
+    <section className="space-y-4 sm:space-y-6">
       <h2 className="font-mono-tech text-xs font-semibold tracking-[0.14em] text-[var(--accent-silver)] uppercase">
         Technical Toolkit
       </h2>
 
-      <div className="space-y-6">
+      <div className="space-y-5 sm:space-y-6">
         {TOOLKIT_ROWS.map((row) => (
           <div key={row.category} className="space-y-2.5">
             <h3 className="text-sm font-medium text-[var(--text-main)]">{row.category}</h3>
-            <div className="flex flex-wrap items-center gap-x-7 gap-y-3">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 sm:gap-x-7 sm:gap-y-3">
               {row.items.map((tool) => (
                 <div
                   key={tool.name}
-                  className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--text-main)]"
+                  className="inline-flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-main)] sm:gap-2 sm:text-sm"
                 >
                   {tool.icon}
                   <span>{tool.name}</span>

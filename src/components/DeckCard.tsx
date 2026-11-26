@@ -221,7 +221,7 @@ export const DeckCard: React.FC<DeckCardProps> = ({
             </div>
 
             <div className="pointer-events-none absolute bottom-[7.4%] left-[8.4%] right-[8.4%] flex h-[17.5%] flex-col justify-between overflow-hidden px-1 py-0.5 text-[#141414]">
-              <p className="line-clamp-4 text-[3.3cqi] leading-[1.2] font-medium">{item.cardEffect}</p>
+              <p className="line-clamp-4 text-[3.6cqi] leading-[1.2] font-medium">{item.cardEffect}</p>
             </div>
           </div>
         )}

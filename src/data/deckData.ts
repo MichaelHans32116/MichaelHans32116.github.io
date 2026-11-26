@@ -10,8 +10,26 @@ import insectraAppImg from '../images/insectra-app/00-app-cardmaker-square.png'
 import insectraLiveHeroImg from '../images/insectra-web/00-live-hero-final.jpg'
 import insectraSplashImg from '../images/insectra-web/00-brand-splash.jpg'
 import insectraMapImg from '../images/insectra-web/03-expert-portal-map.png'
+import adAstraCampImg from '../images/web/ad-astra-camp.jpg'
+import adAstraMeetImg from '../images/web/ad-astra-meet.jpg'
+import codechumSirAdeImg from '../images/web/codechum-sir-ade.jpg'
+import codechumVictoryImg from '../images/web/codechum-victory.jpg'
+import hackforgovBeforeImg from '../images/web/hackforgov-before.jpg'
+import hackforgovNameImg from '../images/web/hackforgov-name.jpg'
+import hackforgovOfficialImg from '../images/web/hackforgov-official.jpg'
+import hackforgovTeamImg from '../images/web/hackforgov-team.jpg'
+import howconnectGroupImg from '../images/web/howconnect-group.jpg'
+import howconnectSystemImg from '../images/web/howconnect-system.jpg'
+import insectraAgriImg from '../images/web/insectra-agri.jpg'
+import insectraDefendedImg from '../images/web/insectra-defended.jpg'
+import insectraEntomologistImg from '../images/web/insectra-entomologist.jpg'
+import insectraFarmImg from '../images/web/insectra-farm.jpg'
+import insectraFarmerImg from '../images/web/insectra-farmer.jpg'
+import ojtMorirokuTeamImg from '../images/web/ojt-moriroku-team.jpg'
+import sirLyndonImg from '../images/web/sir-lyndon.jpg'
+import topcitExamImg from '../images/web/topcit-exam.jpg'
 
-export type DeckCategory = 'all' | 'projects' | 'achievements' | 'references'
+export type DeckCategory = 'all' | 'projects' | 'achievements' | 'references' | 'side'
 export type CardCategory = 'projects' | 'achievements' | 'references'
 export type YgoCardFrame = 'trap' | 'spell' | 'monster'
 export type VisualKind = 'logo' | 'screenshot' | 'badge-icon'
@@ -90,6 +108,13 @@ export interface StandoutHighlight {
   issuer: string
 }
 
+export const DECK_BOX_COVERS = {
+  projects: buildbidHomeImg,
+  achievements: hackforgovOfficialImg,
+  references: ojtMorirokuTeamImg,
+  side: '/assets/projects/salinlahi.png',
+} as const
+
 export const PROFILE = {
   fullName: 'Michael Hans G. Magbojos',
   shortName: 'Michael Hans',
@@ -107,7 +132,7 @@ export const PROFILE = {
   resumeUrl: '/assets/Magbojos_MichaelHans_Resume_CV.pdf',
   heroHeadline: 'Michael Hans Magbojos',
   heroBio:
-    'Fourth-year BSIT student and DOST-SEI Merit Scholar at FAITH Colleges. I build database-backed web platforms, enforce security at the SQL layer, ship internal manufacturing systems, and debug full-stack production apps.',
+    'Fourth-year BSIT student and DOST-SEI Merit Scholar at FAITH Colleges. I build database-backed web apps, enforce security at the SQL layer, and ship internal manufacturing systems.',
 }
 
 export const STANDOUT_HIGHLIGHTS: StandoutHighlight[] = [
@@ -121,7 +146,7 @@ export const STANDOUT_HIGHLIGHTS: StandoutHighlight[] = [
   {
     id: 'st-hackforgov',
     cardId: 'hackforgov',
-    title: 'DICT HackForGov 5 CTF — Top Individual Scorer',
+    title: 'DICT HackForGov 5 CTF: Top Individual Scorer',
     metric: 'CALABARZON #1 · Finals Wildcard',
     issuer: 'DICT Region IV-A · Oct 2026',
   },
@@ -142,7 +167,7 @@ export const STANDOUT_HIGHLIGHTS: StandoutHighlight[] = [
   {
     id: 'st-adastra',
     cardId: 'ad-astra',
-    title: 'Ad Astra — Manuel Quezon Scholar',
+    title: 'Ad Astra Manuel Quezon Scholar',
     metric: '100% Tuition · 5x President’s Lister',
     issuer: 'FAITH Colleges · Since Sep 2023',
   },
@@ -183,7 +208,7 @@ export const EDUCATION_INFO = {
   degree: 'Bachelor of Science in Information Technology · 4th Year (Aug 2023 – Present)',
   honors: [
     'DOST-SEI Undergraduate Merit Scholar (Batch 2023)',
-    'Ad Astra Scholar — Manuel Quezon Award (FAITH Colleges)',
+    'Ad Astra Manuel Quezon Scholar (FAITH Colleges)',
     'Consistent President’s Lister (5x)',
   ],
 }
@@ -208,7 +233,6 @@ export const DECK_CARDS: DeckCardItem[] = [
       { src: buildbidHomeImg, label: 'Role Gateway' },
       { src: buildbidQuotesImg, label: 'Compare Quotes' },
     ],
-    videoSrc: '/videos/buildbid.mp4',
     period: 'June – August 2026 · 458 Commits · 72+ Phases',
     roleOrIssuer: 'Lead UI/UX & Full-Stack Infrastructure',
     metricBadge: '458 Commits',
@@ -262,8 +286,12 @@ export const DECK_CARDS: DeckCardItem[] = [
       { src: insectraSplashImg, label: 'Brand Splash' },
       { src: insectraMapImg, label: 'Expert Map' },
       { src: insectraAppImg, label: 'Mobile App' },
+      { src: insectraDefendedImg, label: 'Capstone Defended' },
+      { src: insectraFarmImg, label: 'Field Farm Test' },
+      { src: insectraAgriImg, label: 'City Agriculture' },
+      { src: insectraEntomologistImg, label: 'Entomologist Review' },
+      { src: insectraFarmerImg, label: 'Farmer Interview' },
     ],
-    videoSrc: '/videos/insectra.mp4',
     period: 'Jan – Nov 2026 · 3-Member Capstone Lead (Defended)',
     roleOrIssuer: 'Capstone Lead · AI / IoT / AWS Cloud',
     metricBadge: 'AWS + YOLO11',
@@ -302,7 +330,6 @@ export const DECK_CARDS: DeckCardItem[] = [
       { src: gatepassScannerImg, label: 'QR Guard Scanner' },
       { src: gatepassLoginImg, label: 'Sign-In Portal' },
     ],
-    videoSrc: '/videos/gatepass.mp4',
     period: 'June – August 2026 · 248-Hour Internship',
     roleOrIssuer: 'Moriroku Philippines, Inc. · Rated Outstanding',
     metricBadge: 'Outstanding',
@@ -341,7 +368,6 @@ export const DECK_CARDS: DeckCardItem[] = [
       { src: hradTicketImg, label: 'Ticket Form' },
       { src: hradLoginImg, label: 'Login Gate' },
     ],
-    videoSrc: '/videos/hrad.mp4',
     period: 'June – August 2026 · 248-Hour Internship',
     roleOrIssuer: 'Moriroku Philippines, Inc. · Co-Builder',
     metricBadge: '.NET 8 + MariaDB',
@@ -375,8 +401,11 @@ export const DECK_CARDS: DeckCardItem[] = [
       'Connects a Vercel web client and Expo React Native mobile app to one C# (.NET 8) REST backend and normalized SQL Server core for House of Worship Los Baños.',
     visualKind: 'screenshot',
     imageSrc: '/assets/projects/howconnect-web.png',
-    previewImages: [{ src: '/assets/projects/howconnect-web.png', label: 'Web Portal' }],
-    videoSrc: '/videos/howconnect.mp4',
+    previewImages: [
+      { src: howconnectSystemImg, label: 'Events & Calendar' },
+      { src: '/assets/projects/howconnect-web.png', label: 'Web Portal' },
+      { src: howconnectGroupImg, label: 'HoW Connect Team' },
+    ],
     period: 'Dec 2025 – Apr 2026',
     roleOrIssuer: 'Author · Project Manager & Full-Stack Dev',
     metricBadge: 'Web + Expo',
@@ -433,9 +462,9 @@ export const DECK_CARDS: DeckCardItem[] = [
       headingB: 'Live Deployments',
       bodyB: 'All four collaborative apps remain deployed live on Vercel for review.',
       bullets: [
-        'Salinlahi — client-side logic and responsive CSS patches',
-        'Gabay Halaman & StarQueen PMTS — Azure DB setup and server deployment',
-        'HanapLokal — exploratory QA bug hunting',
+        'Salinlahi: client-side logic and responsive CSS fixes',
+        'Gabay Halaman & StarQueen PMTS: Azure DB setup and server deployment',
+        'HanapLokal: manual QA and bug hunting',
       ],
     },
     links: [
@@ -461,8 +490,10 @@ export const DECK_CARDS: DeckCardItem[] = [
       'IITP South Korea practical ICT certification (Score: 410/1000) verifying software architecture, SQL data management, networking, ethics & security.',
     visualKind: 'screenshot',
     imageSrc: '/assets/achievements/topcit-certificate.png',
-    supportingImage: '/assets/achievements/topcit-certificate.png',
-    supportingCaption: 'Official TOPCIT Level 3 Certificate (IITP, South Korea · July 23, 2026)',
+    previewImages: [
+      { src: '/assets/achievements/topcit-certificate.png', label: 'Official Certificate' },
+      { src: topcitExamImg, label: 'Exam Day' },
+    ],
     period: 'July 23, 2026',
     roleOrIssuer: 'IITP, Republic of Korea · Level 3',
     metricBadge: '410 / 1000',
@@ -494,6 +525,10 @@ export const DECK_CARDS: DeckCardItem[] = [
     visualKind: 'screenshot',
     imageSrc: '/assets/achievements/hackforgov.jpg',
     previewImages: [
+      { src: hackforgovOfficialImg, label: 'Competition Action' },
+      { src: hackforgovTeamImg, label: 'Team Table' },
+      { src: hackforgovBeforeImg, label: 'Before Round' },
+      { src: hackforgovNameImg, label: 'Team Nameplate' },
       { src: '/assets/achievements/hackforgov.jpg', label: 'Certificates' },
       { src: '/assets/achievements/hackforgov-stage.jpg', label: 'Awarding Stage' },
     ],
@@ -527,8 +562,11 @@ export const DECK_CARDS: DeckCardItem[] = [
       'Placed 6th overall nationwide with a 100% perfect score in Java programming, representing FAITH Colleges under national competition rules.',
     visualKind: 'screenshot',
     imageSrc: '/assets/achievements/isite-java.png',
-    supportingImage: '/assets/achievements/isite-java.png',
-    supportingCaption: 'ISITE-CodeChum Final Competition Leaderboard — 6th Place (65/65 in 56:17)',
+    previewImages: [
+      { src: '/assets/achievements/isite-java.png', label: '6th Overall (65/65)' },
+      { src: codechumVictoryImg, label: 'Victory Chickenjoy' },
+      { src: codechumSirAdeImg, label: 'Briefing w/ Sir Ade' },
+    ],
     period: 'April 2026',
     roleOrIssuer: 'iSITE National Programming Competition',
     metricBadge: '100% · Top 6',
@@ -564,7 +602,7 @@ export const DECK_CARDS: DeckCardItem[] = [
     details: {
       headingA: 'Batch 2023 Official Qualifier',
       bodyA:
-        'Qualified under the 2023 DOST-SEI Undergraduate S&T Scholarship Program (released June 25, 2023; listed under H–O: Magbojos, Michael Hans Gonzales — Merit Scholarship Program, 4,215 Merit qualifiers out of 79,585 examinees nationwide).',
+        'Qualified under the 2023 DOST-SEI Undergraduate S&T Scholarship Program (released June 25, 2023; listed under H-O: Magbojos, Michael Hans Gonzales, Merit Scholarship Program, 4,215 Merit qualifiers out of 79,585 examinees nationwide).',
       headingB: 'Sustained Academic Standing',
       bodyB:
         'Maintained full scholarship standing throughout BS Information Technology at FAITH Colleges while shipping enterprise internship systems.',
@@ -590,8 +628,11 @@ export const DECK_CARDS: DeckCardItem[] = [
       'Scholarship granted by FAITH Colleges for academically competent qualifiers: 100% off tuition fees and 50% off miscellaneous fees while maintaining a GPA above 85.0%.',
     visualKind: 'screenshot',
     imageSrc: '/assets/achievements/ad-astra.png',
-    supportingImage: '/assets/achievements/ad-astra.png',
-    supportingCaption: 'Certificate of Recognition — Manuel Quezon Scholar (Given Sept 9, 2023)',
+    previewImages: [
+      { src: '/assets/achievements/ad-astra.png', label: 'Official Certificate' },
+      { src: adAstraCampImg, label: 'Ad Astra Scholar Camp' },
+      { src: adAstraMeetImg, label: 'Scholar Assembly' },
+    ],
     period: 'September 2023 – Present',
     roleOrIssuer: 'FAITH Colleges · Incorporation Rites Class of 2027',
     metricBadge: '100% Tuition Grant',
@@ -599,12 +640,13 @@ export const DECK_CARDS: DeckCardItem[] = [
       headingA: 'Scholarship Grant',
       bodyA:
         'Awarded the Ad Astra Manuel Quezon Scholarship by FAITH Colleges on September 9, 2023 after passing the institutional scholarship evaluation.',
-      headingB: 'Academic Consistency',
+      headingB: 'Academic Consistency & Scholar Community',
       bodyB:
-        'Covers 100% of tuition fees and 50% of miscellaneous fees by sustaining a GPA above 85.0%, reflected in consistent 5x President’s Lister honors.',
+        'Covers 100% of tuition fees and 50% of miscellaneous fees by keeping a GPA above 85.0%, with 5x President’s Lister honors and active scholar camp events.',
       bullets: [
         '100% tuition grant + 50% miscellaneous fee grant',
         '5x President’s Lister at FAITH Colleges',
+        'Joined the Ad Astra scholar camp and assembly with fellow FAITH scholars',
       ],
     },
     links: [],
@@ -629,8 +671,11 @@ export const DECK_CARDS: DeckCardItem[] = [
       'IT Senior Supervisor at Moriroku Philippines, Inc. (Laguna Technopark). Verified 248-hour Outstanding internship rating, GatePass & HRAD delivery. Contact: l.balois@moriroku.com.ph',
     visualKind: 'screenshot',
     imageSrc: '/assets/achievements/moriroku-ojt.png',
-    supportingImage: '/assets/achievements/moriroku-ojt.png',
-    supportingCaption: 'Moriroku Philippines, Inc. 248-Hour Internship Completion',
+    previewImages: [
+      { src: sirLyndonImg, label: 'Sir Lyndon' },
+      { src: ojtMorirokuTeamImg, label: 'Moriroku Team' },
+      { src: '/assets/achievements/moriroku-ojt.png', label: 'OJT Completion' },
+    ],
     period: 'Internship Supervision · Jun – Aug 2026',
     roleOrIssuer: 'IT Senior Supervisor · Moriroku Philippines, Inc.',
     metricBadge: 'Supervisor',
@@ -665,8 +710,10 @@ export const DECK_CARDS: DeckCardItem[] = [
       'CodeChum–ISITE Java Competition Coach and InsecTra Capstone Panelist at FAITH Colleges. Can verify Top 6 national Java placement and full-stack IoT/AWS capstone defense.',
     visualKind: 'screenshot',
     imageSrc: '/assets/achievements/ref-ade-photo.png',
-    supportingImage: '/assets/achievements/ref-ade-photo.png',
-    supportingCaption: 'Sir Ade Salsona · CodeChum–ISITE Coach & InsecTra Capstone Panelist',
+    previewImages: [
+      { src: codechumSirAdeImg, label: 'CodeChum Coaching' },
+      { src: '/assets/achievements/ref-ade-photo.png', label: 'Faculty Profile' },
+    ],
     period: 'Academic Coaching & InsecTra Defense',
     roleOrIssuer: 'CodeChum–ISITE Coach & Capstone Panelist · FAITH Colleges',
     metricBadge: 'Coach · Panelist',
@@ -787,5 +834,68 @@ export const SIDE_WORK_ARCHIVE: SideWorkItem[] = [
     summary: 'Structured historical web site hosted on Vercel.',
     image: '/assets/projects/japanese-occupation.png',
     links: [{ label: 'Live Site', url: 'https://japanese-occupation.vercel.app/', kind: 'live' }],
+  },
+]
+
+export interface ExperiencePhotoHighlight {
+  id: string
+  src: string
+  label: string
+  caption: string
+  cardId: string
+}
+
+export const OJT_EXPERIENCE_PHOTOS: ExperiencePhotoHighlight[] = [
+  {
+    id: 'ojt-team',
+    src: ojtMorirokuTeamImg,
+    label: 'Moriroku IT Crew',
+    caption: 'Quick coffee break with Sir Lyndon & Moriroku IT teammates in Laguna',
+    cardId: 'ref-lyndon',
+  },
+  {
+    id: 'ojt-cert',
+    src: '/assets/achievements/moriroku-ojt.png',
+    label: '248-Hour Certificate',
+    caption: 'Moriroku Philippines, Inc. internship completion · Rated Outstanding',
+    cardId: 'gatepass',
+  },
+  {
+    id: 'ojt-lyndon',
+    src: sirLyndonImg,
+    label: 'Sir Lyndon Balois',
+    caption: 'IT Senior Supervisor who reviewed GatePass & HRAD sprints',
+    cardId: 'ref-lyndon',
+  },
+]
+
+export const FIELD_MILESTONE_PHOTOS: ExperiencePhotoHighlight[] = [
+  {
+    id: 'fld-insectra-defended',
+    src: insectraDefendedImg,
+    label: 'Capstone Defended',
+    caption: 'InsecTra solar IoT trap & AWS cloud platform successfully defended',
+    cardId: 'insectra',
+  },
+  {
+    id: 'fld-insectra-farm',
+    src: insectraFarmImg,
+    label: 'Live Farm Testing',
+    caption: 'Actual bitter gourd field deployment running YOLO11 on Raspberry Pi',
+    cardId: 'insectra',
+  },
+  {
+    id: 'fld-hackforgov',
+    src: hackforgovOfficialImg,
+    label: 'HackForGov 5 CTF',
+    caption: 'CALABARZON #1 Top Individual Scorer · Tagaytay City',
+    cardId: 'hackforgov',
+  },
+  {
+    id: 'fld-codechum',
+    src: codechumVictoryImg,
+    label: 'CodeChum 65/65',
+    caption: 'Perfect Java competition score celebrated with a Chickenjoy box',
+    cardId: 'isite-java',
   },
 ]

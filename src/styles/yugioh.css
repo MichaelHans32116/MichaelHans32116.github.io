@@ -8,9 +8,9 @@
   --border-subtle: #dedad0;
   --border-hover: #b8b1a2;
   --text-main: #181a1f;
-  --text-secondary: #4e5460;
-  --text-muted: #767d8a;
-  --accent-silver: #647081;
+  --text-secondary: #3f4551;
+  --text-muted: #555c68;
+  --accent-silver: #525e6e;
   --accent-silver-bright: #94a3b8;
   --accent-silver-glow: rgba(148, 163, 184, 0.36);
   --zone-monster: rgba(120, 114, 98, 0.14);
@@ -40,8 +40,8 @@
   --border-subtle: #242b3a;
   --border-hover: #3b455b;
   --text-main: #eef0f5;
-  --text-secondary: #a4acb9;
-  --text-muted: #707989;
+  --text-secondary: #b6bfce;
+  --text-muted: #8f99ab;
   --accent-silver: #cbd5e1;
   --accent-silver-bright: #f1f5f9;
   --accent-silver-glow: rgba(203, 213, 225, 0.34);
@@ -61,6 +61,15 @@
 }
 
 @layer base {
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
   html {
     overflow-x: clip;
     scroll-behavior: smooth;
@@ -150,6 +159,53 @@
 
 .ygo-logo-sheen {
   animation: ygoSplashSheen 1050ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
+}
+
+@keyframes ygoYourTurnEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(8px);
+    letter-spacing: 0.22em;
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.03) translateY(0);
+    letter-spacing: 0.12em;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    letter-spacing: 0.14em;
+  }
+}
+
+@keyframes ygoTurnLineExpand {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.ygo-turn-banner {
+  transition: opacity 260ms cubic-bezier(0.22, 1, 0.36, 1), transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ygo-turn-banner[data-leaving='true'] {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.ygo-turn-text {
+  animation: ygoYourTurnEnter 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ygo-turn-line {
+  animation: ygoTurnLineExpand 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes pullDownHint {
@@ -446,8 +502,8 @@
 
 .ygo-lore-text {
   font-family: var(--font-ygo-body);
-  font-size: 3.55cqi;
-  line-height: 1.18;
+  font-size: 3.75cqi;
+  line-height: 1.22;
   font-weight: 600;
   color: #1c1814;
   margin-top: 0.6cqi;
@@ -686,6 +742,58 @@
   animation: ygoMediaFade 200ms ease-out both;
 }
 
+@keyframes ygoThemeStageFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  16% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  84% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.ygo-theme-flip-stage {
+  perspective: 1300px;
+  animation: ygoThemeStageFade 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ygoFlipToDark {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+@keyframes ygoFlipToLight {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(-180deg);
+  }
+}
+
+.ygo-flip-to-dark {
+  transform-style: preserve-3d;
+  animation: ygoFlipToDark 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ygo-flip-to-light {
+  transform-style: preserve-3d;
+  animation: ygoFlipToLight 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* =========================================================
    DUEL FIELD PLAYMAT & MASTER DUEL DIALOGUE INSPECTOR
    ========================================================= */
@@ -701,6 +809,11 @@
   transform-origin: center 55%;
 }
 
+.duel-field-perspective-mobile {
+  transform: perspective(900px) rotateX(10deg);
+  transform-origin: center 54%;
+}
+
 .duel-dialogue-box {
   position: relative;
 }
@@ -712,6 +825,9 @@
   .ygo-logo-enter,
   .ygo-logo-sheen,
   .ygo-splash-intro,
+  .ygo-turn-banner,
+  .ygo-turn-text,
+  .ygo-turn-line,
   .summon-flash,
   .summon-rays,
   .summon-ring,
@@ -721,7 +837,10 @@
   .ygo-phase-banner,
   .ygo-backdrop-in,
   .ygo-modal-summon,
-  .ygo-media-fade {
+  .ygo-media-fade,
+  .ygo-theme-flip-stage,
+  .ygo-flip-to-dark,
+  .ygo-flip-to-light {
     animation: none !important;
     transition: none !important;
   }
