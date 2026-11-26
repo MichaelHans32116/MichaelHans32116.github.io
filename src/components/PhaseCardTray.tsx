@@ -565,10 +565,10 @@ export function PhaseCardTray({
                 onStepPhase(-1)
               }}
               aria-label="Previous tab"
-              className={`pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-t-[4px] border border-b-0 backdrop-blur-md transition disabled:opacity-35 sm:hidden ${
+              className={`pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-t-[4px] border border-b-0 backdrop-blur-md transition disabled:cursor-not-allowed sm:hidden ${
                 isLight
-                  ? 'border-[#94a3b8] bg-[#ffffff]/94 text-[#181a1f]'
-                  : 'border-[#94a3b8]/70 bg-[#0d1322]/94 text-slate-100'
+                  ? 'border-[#94a3b8] bg-[#ffffff] text-[#181a1f] disabled:text-slate-400/50'
+                  : 'border-[#94a3b8]/70 bg-[#0d1322] text-slate-100 disabled:text-slate-500/50'
               }`}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -636,10 +636,10 @@ export function PhaseCardTray({
                 onStepPhase(1)
               }}
               aria-label="Next tab"
-              className={`pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-t-[4px] border border-b-0 backdrop-blur-md transition disabled:opacity-35 sm:hidden ${
+              className={`pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-t-[4px] border border-b-0 backdrop-blur-md transition disabled:cursor-not-allowed sm:hidden ${
                 isLight
-                  ? 'border-[#94a3b8] bg-[#ffffff]/94 text-[#181a1f]'
-                  : 'border-[#94a3b8]/70 bg-[#0d1322]/94 text-slate-100'
+                  ? 'border-[#94a3b8] bg-[#ffffff] text-[#181a1f] disabled:text-slate-400/50'
+                  : 'border-[#94a3b8]/70 bg-[#0d1322] text-slate-100 disabled:text-slate-500/50'
               }`}
             >
               <ChevronRight className="h-4 w-4" />

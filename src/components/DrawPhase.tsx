@@ -4,7 +4,6 @@ import { ArrowDown, RotateCcw } from 'lucide-react'
 import { BgmMode, BgmTrackId, duelSfx } from '../utils/sfx'
 import { AudioControls } from './AudioControls'
 import { DuelFieldBg } from './DuelFieldBg'
-import { DuelGuideTour, GuideTourStep } from './DuelGuideTour'
 import { backCardUrl, frontCardUrl, HoloYugiohCard } from './HoloYugiohCard'
 import { ThemeFlipButton } from './ThemeFlipButton'
 import { YgoBrandEmblem } from './YgoBrandEmblem'
@@ -35,23 +34,6 @@ const SUMMON_SPARKS = Array.from({ length: 18 }).map((_, idx) => ({
   size: idx % 2 === 0 ? 6 : 4,
 }))
 
-const SPLASH_TOUR_STEPS: GuideTourStep[] = [
-  {
-    id: 'splash-deck',
-    targetSelector: '#tour-splash-deck',
-    speaker: 'Hans',
-    text: 'Hey! Grab this deck and pull downward (or hit Space) to draw my profile card.',
-    fallbackSide: 'top',
-  },
-  {
-    id: 'splash-field',
-    targetSelector: '#duel-field-cards-anchor',
-    speaker: 'Hans',
-    text: 'Every card laid out on the field is a real project, award, or reference you can inspect inside.',
-    fallbackSide: 'top',
-  },
-]
-
 export const DrawPhase: React.FC<DrawPhaseProps> = ({
   onEnterPortfolio,
   sfxEnabled,
@@ -81,8 +63,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     if (typeof window === 'undefined') return 8000
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 8000 : 0
   })
-  const [splashTourOpen, setSplashTourOpen] = useState(false)
-  const [splashTourDismissed, setSplashTourDismissed] = useState(false)
 
   const rootRef = useRef<HTMLDivElement>(null)
   const deckLayerRef = useRef<HTMLDivElement>(null)
@@ -99,6 +79,7 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
   const glideTlRef = useRef<gsap.core.Timeline | null>(null)
   const glideStartedRef = useRef(false)
   const logoTimerRef = useRef<number | null>(null)
+  const lpStartedRef = useRef(false)
 
   const dismissLogoSplash = useCallback(() => {
     if (introStage !== 'logo') return
@@ -123,9 +104,10 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     }
   }, [introStage])
 
-  // Animate Duel Links LP 0 -> 8000 once splash moves past logo
+  // Animate Duel Links LP 0 -> 8000 once splash moves past logo (runs once, never restarts on glide/ready)
   useEffect(() => {
-    if (introStage === 'logo') return
+    if (introStage === 'logo' || lpStartedRef.current) return
+    lpStartedRef.current = true
     const reduced =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -145,20 +127,11 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
       }
     }
     raf = window.requestAnimationFrame(tick)
-    return () => window.cancelAnimationFrame(raf)
-  }, [introStage])
-
-  // Show interactive DuelGuideTour once ready on draw screen
-  useEffect(() => {
-    if (introStage !== 'ready' || phase !== 'idle' || splashTourDismissed) {
-      setSplashTourOpen(false)
-      return
+    return () => {
+      // If component unmounts early, allow re-run only if not yet 8000
+      window.cancelAnimationFrame(raf)
     }
-    const timer = window.setTimeout(() => {
-      setSplashTourOpen(true)
-    }, 480)
-    return () => window.clearTimeout(timer)
-  }, [introStage, phase, splashTourDismissed])
+  }, [introStage])
 
   const computeDeckOriginOffset = useCallback(() => {
     const deckEl = deckStageRef.current
@@ -298,8 +271,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
   const getPullThreshold = () => Math.min(130, Math.max(85, window.innerHeight * 0.16))
 
   const runPullAndPopSequence = useCallback((startX = 0, startY = 0) => {
-    setSplashTourOpen(false)
-    setSplashTourDismissed(true)
     setPhase('animating')
     setDragState('none')
     pointerStartRef.current = null
@@ -400,8 +371,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (phase !== 'idle' || introStage !== 'ready') return
     duelSfx.unlockAudio()
-    setSplashTourOpen(false)
-    setSplashTourDismissed(true)
     pointerStartRef.current = { x: e.clientX, y: e.clientY }
     currentDragRef.current = { x: 0, y: 0 }
     setDragState('pulling')
@@ -470,8 +439,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
 
   const handleEnter = useCallback(() => {
     if (phase === 'entering') return
-    setSplashTourOpen(false)
-    setSplashTourDismissed(true)
     setPhase('entering')
     duelSfx.playHover()
 
@@ -862,26 +829,28 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
 
         <div
           ref={hintRef}
-          className={`pointer-events-none mt-6 flex flex-col items-center gap-2 text-center transition-opacity duration-200 sm:mt-8 sm:gap-2.5 ${
+          className={`pointer-events-none mt-5 flex flex-col items-center text-center transition-opacity duration-200 sm:mt-7 ${
             phase === 'animating' ? 'opacity-0' : ''
           }`}
         >
-          <ArrowDown
-            className={`pull-arrow-bounce h-10 w-10 stroke-[2.25] transition-colors sm:h-12 sm:w-12 ${
-              dragState === 'ready' ? 'text-[var(--accent-silver)]' : 'text-[var(--text-main)]'
-            }`}
-          />
-          <p
-            className={`text-lg font-bold tracking-wide transition-colors sm:text-2xl ${
-              dragState === 'ready' ? 'text-[var(--accent-silver)]' : 'text-[var(--text-main)]'
-            }`}
-          >
-            {dragState === 'ready'
-              ? 'Release to draw!'
-              : dragState === 'tap-hint'
-              ? 'Drag downward'
-              : 'Pull your card'}
-          </p>
+          <div className="inline-flex items-center gap-2.5 rounded-[3px] border border-sky-300/65 bg-[#0b101d]/92 px-4 py-2 text-white shadow-[0_12px_28px_rgba(0,0,0,0.68)] backdrop-blur-md sm:gap-3 sm:px-5 sm:py-2.5">
+            <ArrowDown
+              className={`pull-arrow-bounce h-5 w-5 shrink-0 stroke-[2.5] transition-colors sm:h-6 sm:w-6 ${
+                dragState === 'ready' ? 'text-sky-300' : 'text-white'
+              }`}
+            />
+            <p
+              className={`text-sm font-bold tracking-wide transition-colors sm:text-lg ${
+                dragState === 'ready' ? 'text-sky-300' : 'text-white'
+              }`}
+            >
+              {dragState === 'ready'
+                ? 'Release to draw!'
+                : dragState === 'tap-hint'
+                ? 'Drag downward'
+                : 'Pull your card'}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -948,7 +917,7 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
             phase === 'revealed' ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
           }`}
         >
-          <p className="pointer-events-none text-xs font-medium tracking-wide text-[var(--text-secondary)]">
+          <p className="pointer-events-none rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)]/92 px-3 py-1 text-xs font-medium tracking-wide text-[var(--text-main)] shadow-sm backdrop-blur-md">
             Click anywhere to continue
           </p>
 
@@ -965,16 +934,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
           </button>
         </div>
       </div>
-
-      {/* Splash Guided Pointer + Duel Links Dialogue */}
-      <DuelGuideTour
-        open={splashTourOpen}
-        steps={SPLASH_TOUR_STEPS}
-        onClose={() => {
-          setSplashTourOpen(false)
-          setSplashTourDismissed(true)
-        }}
-      />
     </div>
   )
 }

@@ -53,36 +53,99 @@ const NAV_PHASES: { id: PortfolioPhase; code: string; label: string; banner: str
   { id: 'end', code: 'EP', label: 'Contact', banner: 'END PHASE' },
 ]
 
-const PORTFOLIO_TOUR_STEPS: GuideTourStep[] = [
-  {
-    id: 'home-card',
-    targetSelector: '#tour-hero-card',
-    speaker: 'Hans',
-    text: "Hey, I'm Hans! Tap my card anytime to flip it, or skim my intro right here.",
-    fallbackSide: 'bottom',
-  },
-  {
-    id: 'home-toolkit',
-    targetSelector: '#tour-toolkit',
-    speaker: 'Hans',
-    text: 'Click any skill in my toolkit and the proof panel beside it updates with the real systems I built.',
-    fallbackSide: 'top',
-  },
-  {
-    id: 'home-dock',
-    targetSelector: '#tour-phase-dock',
-    speaker: 'Hans',
-    text: 'Use this bottom dock (or swipe left and right on your phone) to move between Deck, Experience, About Me, and Contact.',
-    fallbackSide: 'top',
-  },
-  {
-    id: 'home-controls',
-    targetSelector: '#tour-controls',
-    speaker: 'Hans',
-    text: 'Switch Light and Dark theme, change Yu-Gi-Oh BGM tracks, or replay this guide anytime up here.',
-    fallbackSide: 'bottom',
-  },
-]
+const TOUR_STEPS_BY_PHASE: Record<PortfolioPhase, GuideTourStep[]> = {
+  standby: [
+    {
+      id: 'home-card',
+      targetSelector: '#tour-hero-card',
+      speaker: 'Hans',
+      text: "Hey, I'm Hans! Tap my card anytime to flip it, or skim my intro right here.",
+      fallbackSide: 'bottom',
+      scrollTarget: true,
+    },
+    {
+      id: 'home-toolkit',
+      targetSelector: '#tour-toolkit-skills',
+      speaker: 'Hans',
+      text: 'Click any skill here and the proof panel beside it updates with the real systems I built.',
+      fallbackSide: 'bottom',
+      scrollTarget: true,
+    },
+    {
+      id: 'home-dock',
+      targetSelector: '#tour-phase-dock',
+      speaker: 'Hans',
+      text: 'Use this bottom dock (or swipe left and right on mobile) to switch between Deck, Experience, About Me, and Contact.',
+      fallbackSide: 'top',
+      scrollTarget: false,
+    },
+    {
+      id: 'home-controls',
+      targetSelector: '#tour-controls',
+      speaker: 'Hans',
+      text: 'Flip Light and Dark mode, switch Yu-Gi-Oh BGM tracks, or replay this guide anytime up here.',
+      fallbackSide: 'bottom',
+      scrollTarget: false,
+      isHeaderTarget: true,
+    },
+  ],
+  main: [
+    {
+      id: 'deck-boxes',
+      targetSelector: '#tour-deck-boxes',
+      speaker: 'Hans',
+      text: 'Pick any Deck Box here to filter Projects, Achievements, References, or Side Deck.',
+      fallbackSide: 'bottom',
+      scrollTarget: true,
+    },
+    {
+      id: 'deck-cards',
+      targetSelector: '#tour-deck-cards',
+      speaker: 'Hans',
+      text: 'Tap any Yu-Gi-Oh card to inspect screenshots, project details, and live links.',
+      fallbackSide: 'bottom',
+      scrollTarget: true,
+    },
+  ],
+  battle: [
+    {
+      id: 'exp-list',
+      targetSelector: '#tour-exp-list',
+      speaker: 'Hans',
+      text: 'Here is my internship delivery at Moriroku PH and full-stack engineering work on BuildBid.',
+      fallbackSide: 'bottom',
+      scrollTarget: true,
+    },
+    {
+      id: 'exp-ojt',
+      targetSelector: '#tour-ojt-strip',
+      speaker: 'Hans',
+      text: 'Click any Moriroku OJT photo to open the matching system or supervisor card.',
+      fallbackSide: 'top',
+      scrollTarget: true,
+    },
+  ],
+  main2: [
+    {
+      id: 'about-boxes',
+      targetSelector: '#tour-life-decks',
+      speaker: 'Hans',
+      text: 'Open any Life Deck box to browse church outreach, friends, Yuki, and hobbies.',
+      fallbackSide: 'bottom',
+      scrollTarget: true,
+    },
+  ],
+  end: [
+    {
+      id: 'contact-form',
+      targetSelector: '#tour-contact-form',
+      speaker: 'Hans',
+      text: 'Send a message straight to my inbox here, or copy my email and open Gmail Web.',
+      fallbackSide: 'top',
+      scrollTarget: true,
+    },
+  ],
+}
 
 const PORTFOLIO_TOUR_KEY = 'mh-portfolio-tour-v1'
 
@@ -262,7 +325,7 @@ export function App() {
     if (seen) return
     const timer = window.setTimeout(() => {
       setPortfolioTourOpen(true)
-    }, 520)
+    }, 600)
     return () => window.clearTimeout(timer)
   }, [activePhase, stage])
 
@@ -596,8 +659,7 @@ export function App() {
               type="button"
               onClick={() => {
                 duelSfx.playHover()
-                if (activePhase !== 'standby') switchPhase('standby')
-                window.setTimeout(() => setPortfolioTourOpen(true), 120)
+                setPortfolioTourOpen(true)
               }}
               className="inline-flex h-8 w-8 items-center justify-center rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs font-medium text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--text-main)] sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3 sm:py-1.5"
               title="Guided page tour"
@@ -695,7 +757,7 @@ export function App() {
                   <HoloYugiohCard flippable />
                 </div>
 
-                <div className="space-y-4 text-left sm:space-y-5">
+                <div className="min-w-0 space-y-4 text-left sm:space-y-5">
                   <div className="space-y-3">
                     <h1 className="font-editorial text-[1.75rem] leading-[1.15] text-[var(--text-main)] sm:text-[2.6rem]">
                       {PROFILE.heroHeadline}
@@ -929,7 +991,7 @@ export function App() {
               </div>
 
               {/* Dueling Nexus style Deck Box Selector */}
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4" role="tablist" aria-label="Deck Boxes">
+              <div id="tour-deck-boxes" className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4" role="tablist" aria-label="Deck Boxes">
                 {(
                   [
                     {
@@ -997,17 +1059,18 @@ export function App() {
                 })}
               </div>
 
-              {(deckFilter === 'all' || deckFilter === 'projects') &&
-                renderDeckShelf('Main Deck · Trap Cards (Projects)', trapCards)}
+              <div id="tour-deck-cards" className="space-y-10 sm:space-y-14">
+                {(deckFilter === 'all' || deckFilter === 'projects') &&
+                  renderDeckShelf('Main Deck · Trap Cards (Projects)', trapCards)}
 
-              {(deckFilter === 'all' || deckFilter === 'achievements') &&
-                renderDeckShelf('Main Deck · Spell Cards (Achievements & Scholarships)', spellCards)}
+                {(deckFilter === 'all' || deckFilter === 'achievements') &&
+                  renderDeckShelf('Main Deck · Spell Cards (Achievements & Scholarships)', spellCards)}
 
-              {(deckFilter === 'all' || deckFilter === 'references') &&
-                renderDeckShelf('Main Deck · Monster Cards (Character References)', monsterCards)}
+                {(deckFilter === 'all' || deckFilter === 'references') &&
+                  renderDeckShelf('Main Deck · Monster Cards (Character References)', monsterCards)}
 
-              {(deckFilter === 'all' || deckFilter === 'side') && (
-                <section className="space-y-5 border-t border-dashed border-[var(--border-hover)] pt-8 sm:space-y-6 sm:pt-10">
+                {(deckFilter === 'all' || deckFilter === 'side') && (
+                  <section className="space-y-5 border-t border-dashed border-[var(--border-hover)] pt-8 sm:space-y-6 sm:pt-10">
                   <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-[var(--border-subtle)] pb-2.5">
                     <div>
                       <p className="font-mono-tech text-[10px] font-semibold tracking-[0.16em] text-[var(--accent-silver)] uppercase">
@@ -1080,6 +1143,7 @@ export function App() {
                   </div>
                 </section>
               )}
+              </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] pt-6 sm:pt-8">
                 <button
@@ -1124,7 +1188,7 @@ export function App() {
                 </p>
               </div>
 
-              <div className="grid gap-5 sm:gap-6 md:grid-cols-2">
+              <div id="tour-exp-list" className="grid gap-5 sm:gap-6 md:grid-cols-2">
                 {EXPERIENCE_HIGHLIGHTS.map((exp) => (
                   <article
                     key={exp.id}
@@ -1155,7 +1219,7 @@ export function App() {
               </div>
 
               {/* Moriroku OJT Team & Completion Strip */}
-              <section className="space-y-4 border-t border-[var(--border-subtle)] pt-8 sm:space-y-5">
+              <section id="tour-ojt-strip" className="space-y-4 border-t border-[var(--border-subtle)] pt-8 sm:space-y-5">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <h2 className="font-mono-tech text-xs font-semibold tracking-[0.14em] text-[var(--accent-silver)] uppercase">
                     Moriroku Philippines OJT Moments
@@ -1348,6 +1412,7 @@ export function App() {
 
                 {/* Right Column: Sharp Cham-Style Contact Form */}
                 <form
+                  id="tour-contact-form"
                   onSubmit={handleSendContactMessage}
                   className="space-y-4 rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-7"
                 >
@@ -1483,7 +1548,7 @@ export function App() {
 
       <DuelGuideTour
         open={portfolioTourOpen}
-        steps={PORTFOLIO_TOUR_STEPS}
+        steps={TOUR_STEPS_BY_PHASE[activePhase]}
         onClose={closePortfolioTour}
       />
     </div>

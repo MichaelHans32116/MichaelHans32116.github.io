@@ -72,6 +72,10 @@ export function MobileHeaderMotion({ resetKey }: MobileHeaderMotionProps) {
 
     const update = () => {
       frame = 0
+      if (document.body.dataset.tourActive === 'true') {
+        resetVisible()
+        return
+      }
       const nextY = Math.max(0, window.scrollY)
       const deltaY = nextY - lastY
       lastY = nextY
@@ -125,6 +129,7 @@ export function MobileHeaderMotion({ resetKey }: MobileHeaderMotionProps) {
     resetVisible()
     window.addEventListener('scroll', schedule, { passive: true })
     window.addEventListener('resize', schedule)
+    window.addEventListener('mh-reveal-topbar', reveal)
     header.addEventListener('focusin', reveal)
 
     return () => {
@@ -133,6 +138,7 @@ export function MobileHeaderMotion({ resetKey }: MobileHeaderMotionProps) {
       resetVisible()
       window.removeEventListener('scroll', schedule)
       window.removeEventListener('resize', schedule)
+      window.removeEventListener('mh-reveal-topbar', reveal)
       header.removeEventListener('focusin', reveal)
     }
   }, [resetKey])

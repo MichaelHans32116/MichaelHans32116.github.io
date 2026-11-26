@@ -8,6 +8,8 @@ export interface GuideTourStep {
   speaker?: string
   text: string
   fallbackSide?: 'top' | 'bottom'
+  scrollTarget?: boolean
+  isHeaderTarget?: boolean
 }
 
 interface DuelGuideTourProps {
@@ -37,7 +39,21 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
       setStepIdx(0)
       setTypedLen(0)
     }
-  }, [open])
+  }, [open, steps])
+
+  // Keep mobile topbar revealed and un-hidden while guided tour is open
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    if (open) {
+      document.body.dataset.tourActive = 'true'
+      window.dispatchEvent(new CustomEvent('mh-reveal-topbar'))
+    } else {
+      delete document.body.dataset.tourActive
+    }
+    return () => {
+      delete document.body.dataset.tourActive
+    }
+  }, [open, stepIdx])
 
   // Typewriter reveal for Duel Links speech bubble
   useEffect(() => {
@@ -76,40 +92,78 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose, open])
 
-  // Measure target rect & follow scroll/resize
+  // Auto-scroll target smoothly into safe viewport band & continuously measure during settle
   useLayoutEffect(() => {
     if (!open || !current) return
-    let raf = 0
+
+    if (current.isHeaderTarget) {
+      window.dispatchEvent(new CustomEvent('mh-reveal-topbar'))
+    }
 
     const measure = () => {
       const vw = window.innerWidth
       const vh = window.innerHeight
       const el = document.querySelector<HTMLElement | SVGElement>(current.targetSelector)
       if (!el) {
-        setBox({ left: vw / 2 - 60, top: vh * 0.36, width: 120, height: 80, vw, vh })
+        setBox({ left: Math.round(vw / 2 - 60), top: Math.round(vh * 0.36), width: 120, height: 80, vw, vh })
         return
       }
       const r = el.getBoundingClientRect()
       if (r.width === 0 && r.height === 0) {
-        setBox({ left: vw / 2 - 60, top: vh * 0.36, width: 120, height: 80, vw, vh })
+        setBox({ left: Math.round(vw / 2 - 60), top: Math.round(vh * 0.36), width: 120, height: 80, vw, vh })
         return
       }
+      const visTop = Math.max(8, Math.min(vh - 48, r.top))
+      const rawBottom = Math.min(vh - 8, r.bottom)
+      const maxH =
+        current.scrollTarget === false
+          ? rawBottom - visTop
+          : Math.min(rawBottom - visTop, Math.round(vh * 0.44))
+      const visHeight = Math.max(36, maxH)
+      const visLeft = Math.max(8, r.left)
+      const visWidth = Math.max(48, Math.min(vw - 16, r.right - visLeft))
+
       setBox({
-        left: Math.max(8, r.left),
-        top: Math.max(8, r.top),
-        width: Math.min(vw - 16, r.width),
-        height: Math.min(vh - 16, r.height),
+        left: Math.round(visLeft),
+        top: Math.round(visTop),
+        width: Math.round(visWidth),
+        height: Math.round(visHeight),
         vw,
         vh,
       })
     }
 
+    if (current.scrollTarget !== false) {
+      const el = document.querySelector<HTMLElement | SVGElement>(current.targetSelector)
+      if (el) {
+        const r = el.getBoundingClientRect()
+        const vh = window.innerHeight
+        const preferredTop =
+          current.fallbackSide === 'top'
+            ? Math.max(88, Math.round(vh * 0.48))
+            : Math.max(88, Math.round((vh - Math.min(r.height, vh * 0.44)) * 0.34))
+        const targetScrollY = Math.max(0, window.scrollY + r.top - preferredTop)
+        if (Math.abs(targetScrollY - window.scrollY) > 12) {
+          const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          window.scrollTo({ top: targetScrollY, behavior: reduced ? 'instant' : 'smooth' })
+        }
+      }
+    }
+
+    let raf = 0
     const schedule = () => {
       window.cancelAnimationFrame(raf)
       raf = window.requestAnimationFrame(measure)
     }
 
     measure()
+    // Follow smooth scroll & CSS settles cleanly over 750ms
+    const followInterval = window.setInterval(measure, 48)
+    const stopFollowTimer = window.setTimeout(() => {
+      window.clearInterval(followInterval)
+      measure()
+    }, 780)
+
     const observer =
       typeof ResizeObserver !== 'undefined' ? new ResizeObserver(schedule) : null
     const target = document.querySelector(current.targetSelector)
@@ -118,6 +172,8 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
     window.addEventListener('scroll', schedule, { passive: true })
 
     return () => {
+      window.clearInterval(followInterval)
+      window.clearTimeout(stopFollowTimer)
       observer?.disconnect()
       window.cancelAnimationFrame(raf)
       window.removeEventListener('resize', schedule)
@@ -130,28 +186,43 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
   const { left, top, width, height, vw, vh } = box
   const isMobile = vw < 640
 
-  // Pointer lands cleanly near top-left/center edge of target without covering center
-  const pointerX = Math.max(18, Math.min(vw - 44, left + width * 0.32))
-  const pointerY = Math.max(18, Math.min(vh - 44, top + Math.min(28, height * 0.28)))
+  // Place cursor tip inside the lower-right edge of target so it clearly points at it without blocking center text
+  const pointerX = Math.max(14, Math.min(vw - 38, left + Math.min(width * 0.78, width - 14)))
+  const pointerY = Math.max(14, Math.min(vh - 38, top + Math.min(height * 0.74, height - 10)))
 
-  // Position speech bubble so it avoids the highlighted element & bottom dock
-  const bubbleW = isMobile ? Math.min(360, vw - 24) : Math.min(420, vw - 32)
-  const targetInLowerHalf = top + height * 0.5 > vh * 0.54
-  const bubbleLeft = isMobile
+  const bubbleW = isMobile ? Math.min(352, vw - 24) : Math.min(410, vw - 32)
+  const estH = 186
+  const spaceAbove = top - 16
+  const spaceBelow = vh - (top + height) - 16
+  const spaceRight = vw - (left + width) - 16
+
+  let bubbleLeft = isMobile
     ? Math.round((vw - bubbleW) / 2)
     : Math.max(16, Math.min(vw - bubbleW - 16, left + width / 2 - bubbleW / 2))
 
   let bubbleStyle: React.CSSProperties
-  if (isMobile) {
-    bubbleStyle = targetInLowerHalf
-      ? { left: bubbleLeft, top: 68, width: bubbleW }
-      : { left: bubbleLeft, bottom: 76, width: bubbleW }
-  } else if (targetInLowerHalf || current.fallbackSide === 'top') {
-    const preferredTop = Math.max(72, Math.min(top - 178, vh - 210))
-    bubbleStyle = { left: bubbleLeft, top: preferredTop, width: bubbleW }
+  if (current.fallbackSide !== 'top' && spaceBelow >= estH + 16) {
+    bubbleStyle = {
+      left: bubbleLeft,
+      top: Math.max(16, Math.min(vh - estH - 16, top + height + 16)),
+      width: bubbleW,
+    }
+  } else if (spaceAbove >= estH + 16) {
+    bubbleStyle = {
+      left: bubbleLeft,
+      top: Math.max(16, top - estH - 14),
+      width: bubbleW,
+    }
+  } else if (!isMobile && spaceRight >= bubbleW + 24) {
+    bubbleStyle = {
+      left: left + width + 16,
+      top: Math.max(72, Math.min(vh - estH - 16, top)),
+      width: bubbleW,
+    }
+  } else if (spaceAbove >= spaceBelow) {
+    bubbleStyle = { left: bubbleLeft, top: 68, width: bubbleW }
   } else {
-    const preferredTop = Math.max(72, Math.min(top + height + 18, vh - 196))
-    bubbleStyle = { left: bubbleLeft, top: preferredTop, width: bubbleW }
+    bubbleStyle = { left: bubbleLeft, bottom: 78, width: bubbleW }
   }
 
   const shownText = current.text.slice(0, typedLen)
@@ -159,10 +230,6 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
 
   const goNext = () => {
     duelSfx.playHover()
-    if (!isTypingDone) {
-      setTypedLen(current.text.length)
-      return
-    }
     if (stepIdx < steps.length - 1) {
       setStepIdx((s) => s + 1)
     } else {
@@ -171,20 +238,17 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
   }
 
   return createPortal(
-    <div
-      aria-live="polite"
-      className="pointer-events-none fixed inset-0 z-[75]"
-    >
+    <div aria-live="polite" className="pointer-events-none fixed inset-0 z-[75]">
       {/* Target highlight box */}
       <div
         aria-hidden="true"
         style={{
           left: Math.max(4, left - 4),
           top: Math.max(4, top - 4),
-          width: Math.min(vw - 8, width + 8),
-          height: Math.min(vh - 8, height + 8),
+          width: Math.max(40, Math.min(vw - 4 - Math.max(4, left - 4), width + 8)),
+          height: Math.max(36, Math.min(vh - 4 - Math.max(4, top - 4), height + 8)),
         }}
-        className="fixed rounded-[4px] border-2 border-sky-400/85 shadow-[0_0_18px_rgba(56,189,248,0.42)] transition-all duration-300"
+        className="fixed rounded-[4px] border-2 border-sky-400/85 shadow-[0_0_18px_rgba(56,189,248,0.42)] transition-all duration-200"
       />
 
       {/* Animated Cursor Pointer Arrow */}
@@ -192,12 +256,12 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
         aria-hidden="true"
         style={{
           transform: `translate3d(${pointerX}px, ${pointerY}px, 0)`,
-          transition: 'transform 460ms cubic-bezier(0.22, 1, 0.36, 1)',
+          transition: 'transform 380ms cubic-bezier(0.22, 1, 0.36, 1)',
         }}
         className="fixed left-0 top-0 z-10"
       >
         <div className="ygo-pointer-bob drop-shadow-[0_6px_12px_rgba(0,0,0,0.45)]">
-          <svg width="30" height="30" viewBox="0 0 28 28" fill="none">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
             <path
               d="M4 3L23 11.5L14.5 14.5L11.5 23L4 3Z"
               fill="#38bdf8"
@@ -217,7 +281,7 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
         onClick={() => {
           if (!isTypingDone) setTypedLen(current.text.length)
         }}
-        className="ygo-modal-summon pointer-events-auto fixed z-20 transition-all duration-300"
+        className="ygo-modal-summon pointer-events-auto fixed z-20 transition-all duration-200"
       >
         <div className="ygo-duel-bubble-frame">
           <div className="ygo-duel-bubble-inner px-4 py-3 sm:px-5 sm:py-3.5">
@@ -256,7 +320,7 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
 
             <div className="mt-2.5 flex items-center justify-between gap-2 pt-1">
               <span className="text-[10.5px] font-medium text-slate-500">
-                {isTypingDone ? 'Pick Next or explore on your own' : 'Tap to complete text'}
+                {isTypingDone ? 'Click Next to continue' : 'Tap bubble to reveal'}
               </span>
 
               <div className="flex items-center gap-1.5">

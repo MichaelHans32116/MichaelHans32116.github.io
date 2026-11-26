@@ -528,7 +528,7 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
         </p>
       </section>
 
-      <section aria-label="Life Deck Boxes">
+      <section id="tour-life-decks" aria-label="Life Deck Boxes">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
           {LIFE_DECKS.map((deck, idx) => (
             <DuelDeckBoxCard

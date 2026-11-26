@@ -370,7 +370,7 @@ export const TechToolkit: React.FC<TechToolkitProps> = ({ onOpenCard }) => {
 
       <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr] lg:items-start lg:gap-6">
         {/* Left: Clickable Skill Buttons */}
-        <div className="space-y-4 sm:space-y-5">
+        <div id="tour-toolkit-skills" className="min-w-0 space-y-4 sm:space-y-5">
           {TOOLKIT_ROWS.map((row) => (
             <div key={row.category} className="space-y-2">
               <h3 className="text-xs font-semibold tracking-wide text-[var(--text-main)] sm:text-sm">
@@ -419,7 +419,7 @@ export const TechToolkit: React.FC<TechToolkitProps> = ({ onOpenCard }) => {
         {/* Right: Dynamic Proof Panel updating cleanly on skill selection */}
         <div
           key={selectedSkill}
-          className="ygo-media-fade rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-5 lg:sticky lg:top-20"
+          className="ygo-media-fade min-w-0 rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-5 lg:sticky lg:top-20"
         >
           <div className="flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-3">
             <div className="flex items-center gap-2 text-[var(--text-main)]">
