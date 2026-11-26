@@ -43,6 +43,7 @@ export const DeckCardModal: React.FC<DeckCardModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLElement | null>(null)
   const wasOpenRef = useRef(false)
+  const mediaTouchStartRef = useRef<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
     setVideoFailed(false)
@@ -287,7 +288,27 @@ export const DeckCardModal: React.FC<DeckCardModalProps> = ({
 
           <div className="mt-4 space-y-4 sm:mt-6 sm:space-y-6">
             {activeMedia && (
-              <div className="space-y-3">
+              <div
+                className="space-y-3"
+                onTouchStart={(e) => {
+                  const t = e.touches[0]
+                  mediaTouchStartRef.current = { x: t.clientX, y: t.clientY }
+                }}
+                onTouchEnd={(e) => {
+                  const start = mediaTouchStartRef.current
+                  mediaTouchStartRef.current = null
+                  if (!start || mediaList.length <= 1) return
+                  const t = e.changedTouches[0]
+                  const dx = t.clientX - start.x
+                  const dy = t.clientY - start.y
+                  if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+                    duelSfx.playHover()
+                    setMediaIdx((prev) =>
+                      dx < 0 ? (prev + 1) % mediaList.length : (prev - 1 + mediaList.length) % mediaList.length,
+                    )
+                  }
+                }}
+              >
                 {activeMedia.kind === 'video' ? (
                   <div className="overflow-hidden rounded-[2px] border border-[var(--border-subtle)] bg-black">
                     <video

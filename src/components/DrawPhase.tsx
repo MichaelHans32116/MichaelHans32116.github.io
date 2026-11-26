@@ -4,6 +4,7 @@ import { ArrowDown, RotateCcw } from 'lucide-react'
 import { BgmMode, BgmTrackId, duelSfx } from '../utils/sfx'
 import { AudioControls } from './AudioControls'
 import { DuelFieldBg } from './DuelFieldBg'
+import { DuelGuideTour, GuideTourStep } from './DuelGuideTour'
 import { backCardUrl, frontCardUrl, HoloYugiohCard } from './HoloYugiohCard'
 import { ThemeFlipButton } from './ThemeFlipButton'
 import { YgoBrandEmblem } from './YgoBrandEmblem'
@@ -25,7 +26,7 @@ interface DrawPhaseProps {
 }
 
 type DrawState = 'idle' | 'animating' | 'revealed' | 'entering'
-type IntroStage = 'your-turn' | 'gliding' | 'ready'
+type IntroStage = 'logo' | 'your-turn' | 'gliding' | 'ready'
 
 const SUMMON_SPARKS = Array.from({ length: 18 }).map((_, idx) => ({
   angle: `${idx * 20}deg`,
@@ -33,6 +34,23 @@ const SUMMON_SPARKS = Array.from({ length: 18 }).map((_, idx) => ({
   color: idx % 3 === 0 ? '#93c5fd' : '#e2e8f0',
   size: idx % 2 === 0 ? 6 : 4,
 }))
+
+const SPLASH_TOUR_STEPS: GuideTourStep[] = [
+  {
+    id: 'splash-deck',
+    targetSelector: '#tour-splash-deck',
+    speaker: 'Hans',
+    text: 'Hey! Grab this deck and pull downward (or hit Space) to draw my profile card.',
+    fallbackSide: 'top',
+  },
+  {
+    id: 'splash-field',
+    targetSelector: '#duel-field-cards-anchor',
+    speaker: 'Hans',
+    text: 'Every card laid out on the field is a real project, award, or reference you can inspect inside.',
+    fallbackSide: 'top',
+  },
+]
 
 export const DrawPhase: React.FC<DrawPhaseProps> = ({
   onEnterPortfolio,
@@ -54,10 +72,17 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
   const [burstKey, setBurstKey] = useState(0)
 
   const [introStage, setIntroStage] = useState<IntroStage>(() => {
-    if (typeof window === 'undefined') return 'your-turn'
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'ready' : 'your-turn'
+    if (typeof window === 'undefined') return 'logo'
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'ready' : 'logo'
   })
+  const [logoLeaving, setLogoLeaving] = useState(false)
   const [turnLeaving, setTurnLeaving] = useState(false)
+  const [lpValue, setLpValue] = useState(() => {
+    if (typeof window === 'undefined') return 8000
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 8000 : 0
+  })
+  const [splashTourOpen, setSplashTourOpen] = useState(false)
+  const [splashTourDismissed, setSplashTourDismissed] = useState(false)
 
   const rootRef = useRef<HTMLDivElement>(null)
   const deckLayerRef = useRef<HTMLDivElement>(null)
@@ -73,6 +98,67 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
   const tlRef = useRef<gsap.core.Timeline | null>(null)
   const glideTlRef = useRef<gsap.core.Timeline | null>(null)
   const glideStartedRef = useRef(false)
+  const logoTimerRef = useRef<number | null>(null)
+
+  const dismissLogoSplash = useCallback(() => {
+    if (introStage !== 'logo') return
+    if (logoTimerRef.current) {
+      window.clearTimeout(logoTimerRef.current)
+      logoTimerRef.current = null
+    }
+    setLogoLeaving(true)
+    logoTimerRef.current = window.setTimeout(() => {
+      setIntroStage((prev) => (prev === 'logo' ? 'your-turn' : prev))
+    }, 220)
+  }, [introStage])
+
+  // Stage 1: MICHAEL HANS fiery Yu-Gi-Oh! crest -> Stage 2: YOUR TURN!
+  useEffect(() => {
+    if (introStage !== 'logo') return
+    const fadeTimer = window.setTimeout(() => setLogoLeaving(true), 1150)
+    const nextTimer = window.setTimeout(() => setIntroStage('your-turn'), 1450)
+    return () => {
+      window.clearTimeout(fadeTimer)
+      window.clearTimeout(nextTimer)
+    }
+  }, [introStage])
+
+  // Animate Duel Links LP 0 -> 8000 once splash moves past logo
+  useEffect(() => {
+    if (introStage === 'logo') return
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) {
+      setLpValue(8000)
+      return
+    }
+    let raf = 0
+    const start = performance.now()
+    const duration = 640
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration)
+      const eased = 1 - Math.pow(1 - p, 3)
+      setLpValue(Math.round(8000 * eased))
+      if (p < 1) {
+        raf = window.requestAnimationFrame(tick)
+      }
+    }
+    raf = window.requestAnimationFrame(tick)
+    return () => window.cancelAnimationFrame(raf)
+  }, [introStage])
+
+  // Show interactive DuelGuideTour once ready on draw screen
+  useEffect(() => {
+    if (introStage !== 'ready' || phase !== 'idle' || splashTourDismissed) {
+      setSplashTourOpen(false)
+      return
+    }
+    const timer = window.setTimeout(() => {
+      setSplashTourOpen(true)
+    }, 480)
+    return () => window.clearTimeout(timer)
+  }, [introStage, phase, splashTourDismissed])
 
   const computeDeckOriginOffset = useCallback(() => {
     const deckEl = deckStageRef.current
@@ -108,7 +194,7 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     const maxCenterX = vw - scaledW * 0.52 - 8
     const clampedTargetX = Math.max(minCenterX, Math.min(targetX, maxCenterX))
     const clampedTargetY = Math.max(
-      deckCy + vh * (isCompact ? 0.04 : 0.10),
+      deckCy + vh * (isCompact ? 0.04 : 0.1),
       Math.min(targetY, vh - scaledH * 0.5 - 12),
     )
 
@@ -169,16 +255,15 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     glideTlRef.current = tl
   }, [])
 
-  // Position 3D deck inside bottom-right Deck Zone initially during "YOUR TURN!", then smoothly glide to center!
+  // Pin 3D deck inside bottom-right Deck Zone during logo & YOUR TURN!, then glide on timer
   useLayoutEffect(() => {
-    if (introStage !== 'your-turn' || glideStartedRef.current) return
+    if ((introStage !== 'logo' && introStage !== 'your-turn') || glideStartedRef.current) return
     const stageEl = deckStageRef.current
     const hintEl = hintRef.current
     if (!stageEl) return
 
     const placeAtDeckSlot = () => {
       if (glideStartedRef.current || !deckStageRef.current) return
-      // Clear transform momentarily to measure natural centered box, then pin at slot
       gsap.set(deckStageRef.current, { x: 0, y: 0, scale: 1, rotateX: 0, rotateZ: 0 })
       const origin = computeDeckOriginOffset()
       gsap.set(deckStageRef.current, {
@@ -197,19 +282,24 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
       gsap.set(hintEl, { opacity: 0, y: 10 })
     }
 
-    const timer = window.setTimeout(() => {
-      startDeckGlide()
-    }, 1150)
+    let timer: number | undefined
+    if (introStage === 'your-turn') {
+      timer = window.setTimeout(() => {
+        startDeckGlide()
+      }, 1050)
+    }
 
     return () => {
       window.cancelAnimationFrame(rafId)
-      window.clearTimeout(timer)
+      if (timer) window.clearTimeout(timer)
     }
   }, [computeDeckOriginOffset, introStage, startDeckGlide])
 
   const getPullThreshold = () => Math.min(130, Math.max(85, window.innerHeight * 0.16))
 
   const runPullAndPopSequence = useCallback((startX = 0, startY = 0) => {
+    setSplashTourOpen(false)
+    setSplashTourDismissed(true)
     setPhase('animating')
     setDragState('none')
     pointerStartRef.current = null
@@ -310,6 +400,8 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (phase !== 'idle' || introStage !== 'ready') return
     duelSfx.unlockAudio()
+    setSplashTourOpen(false)
+    setSplashTourDismissed(true)
     pointerStartRef.current = { x: e.clientX, y: e.clientY }
     currentDragRef.current = { x: 0, y: 0 }
     setDragState('pulling')
@@ -378,6 +470,8 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
 
   const handleEnter = useCallback(() => {
     if (phase === 'entering') return
+    setSplashTourOpen(false)
+    setSplashTourDismissed(true)
     setPhase('entering')
     duelSfx.playHover()
 
@@ -423,6 +517,13 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (introStage === 'logo') {
+        if (e.code === 'Escape' || e.code === 'Space' || e.code === 'Enter') {
+          e.preventDefault()
+          dismissLogoSplash()
+        }
+        return
+      }
       if (introStage === 'your-turn') {
         if (e.code === 'Escape' || e.code === 'Space' || e.code === 'Enter') {
           e.preventDefault()
@@ -444,7 +545,7 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [handleEnter, introStage, onEnterPortfolio, phase, runPullAndPopSequence, startDeckGlide])
+  }, [dismissLogoSplash, handleEnter, introStage, onEnterPortfolio, phase, runPullAndPopSequence, startDeckGlide])
 
   useEffect(() => {
     duelSfx.enterSplashStage()
@@ -458,6 +559,7 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
       window.removeEventListener('pointerdown', unlock)
       window.removeEventListener('touchstart', unlock)
       window.removeEventListener('keydown', unlock)
+      if (logoTimerRef.current) window.clearTimeout(logoTimerRef.current)
       tlRef.current?.kill()
       glideTlRef.current?.kill()
     }
@@ -467,6 +569,10 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     <div
       ref={rootRef}
       onClick={() => {
+        if (introStage === 'logo') {
+          dismissLogoSplash()
+          return
+        }
         if (introStage === 'your-turn') {
           startDeckGlide()
           return
@@ -476,13 +582,81 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         }
       }}
       className={`splash-canvas relative h-[100dvh] w-full overflow-hidden select-none ${
-        phase === 'revealed' || introStage === 'your-turn' ? 'cursor-pointer' : ''
+        phase === 'revealed' || introStage === 'logo' || introStage === 'your-turn' ? 'cursor-pointer' : ''
       }`}
     >
-      {/* ARCHITECTURAL YU-GI-OH! DUEL FIELD PLAYMAT (POPULATED WITH PORTFOLIO CARDS) */}
+      {/* ARCHITECTURAL YU-GI-OH! DUEL FIELD PLAYMAT (SHARP & UNBLURRED CARDS) */}
       <DuelFieldBg variant="splash" />
 
-      {/* NON-OPAQUE SILVER YU-GI-OH! "YOUR TURN!" SLASH OVERLAY (NO JAPANESE TEXT, PLAYMAT VISIBLE) */}
+      {/* STAGE 1: FIERY RED/METALLIC MICHAEL HANS YU-GI-OH! SPLASH LOGO */}
+      {introStage === 'logo' && (
+        <div
+          onClick={(e) => {
+            e.stopPropagation()
+            dismissLogoSplash()
+          }}
+          data-leaving={logoLeaving ? 'true' : 'false'}
+          role="button"
+          tabIndex={0}
+          aria-label="Skip opening emblem"
+          className="ygo-splash-intro splash-canvas fixed inset-0 z-50 flex cursor-pointer flex-col items-center justify-center px-6"
+        >
+          <div className="ygo-logo-enter relative flex flex-col items-center">
+            <div className="relative flex items-center justify-center px-6 py-4">
+              <svg
+                viewBox="0 0 560 170"
+                className="h-auto w-[min(440px,84vw)] drop-shadow-[0_14px_26px_rgba(0,0,0,0.42)]"
+                aria-hidden="true"
+              >
+                <defs>
+                  <linearGradient id="ygoFlameGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="var(--logo-flame-top)" />
+                    <stop offset="55%" stopColor="var(--logo-flame-mid)" />
+                    <stop offset="100%" stopColor="var(--logo-flame-dark)" />
+                  </linearGradient>
+                  <linearGradient id="ygoSilverRim" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#f8fafc" />
+                    <stop offset="50%" stopColor="#cbd5e1" />
+                    <stop offset="100%" stopColor="#64748b" />
+                  </linearGradient>
+                </defs>
+                <polygon
+                  points="24,96 76,34 114,56 168,14 218,52 280,10 342,52 392,14 446,56 484,34 536,96 474,116 502,156 402,130 342,162 280,126 218,162 158,130 58,156 86,116"
+                  fill="url(#ygoFlameGrad)"
+                  stroke="var(--logo-stroke)"
+                  strokeWidth="8"
+                  strokeLinejoin="miter"
+                />
+                <polygon
+                  points="58,94 98,52 132,68 176,34 220,64 280,28 340,64 384,34 428,68 462,52 502,94 454,110 472,138 394,118 340,144 280,114 220,144 166,118 88,138 106,110"
+                  fill="none"
+                  stroke="url(#ygoSilverRim)"
+                  strokeWidth="2.4"
+                  opacity="0.82"
+                />
+              </svg>
+
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
+                <span
+                  className="relative select-none px-4 text-center text-[clamp(1.65rem,6.2vw,3.1rem)] font-black tracking-[0.06em] uppercase"
+                  style={{
+                    fontFamily: 'var(--font-ygo-title)',
+                    color: '#f8fafc',
+                    WebkitTextStroke: '1.8px #111111',
+                    textShadow:
+                      '0 2px 0 #111111, 0 4px 0 rgba(0,0,0,0.65), 0 0 18px rgba(226, 232, 240, 0.45)',
+                  }}
+                >
+                  MICHAEL HANS
+                </span>
+                <span className="ygo-logo-sheen pointer-events-none absolute inset-y-2 w-20 bg-gradient-to-r from-transparent via-white/75 to-transparent blur-[2px]" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* STAGE 2: NON-OPAQUE SILVER YU-GI-OH! "YOUR TURN!" SLASH OVERLAY */}
       {introStage === 'your-turn' && (
         <div
           data-leaving={turnLeaving ? 'true' : 'false'}
@@ -535,7 +709,8 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         onClick={(e) => {
           e.stopPropagation()
           duelSfx.playHover()
-          if (introStage === 'your-turn') startDeckGlide()
+          if (introStage === 'logo') dismissLogoSplash()
+          else if (introStage === 'your-turn') startDeckGlide()
         }}
         aria-label="Michael Hans"
         className="absolute left-4 top-3.5 z-[60] flex items-center text-left transition hover:brightness-105 active:scale-[0.98] sm:left-8 sm:top-5"
@@ -578,6 +753,43 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         )}
       </div>
 
+      {/* Duel Links style LP: 8000 HUD at Bottom-Left */}
+      {introStage !== 'logo' && phase !== 'entering' && (
+        <div
+          aria-label="Life Points 8000"
+          className="pointer-events-none fixed bottom-3.5 left-3.5 z-30 flex items-center sm:bottom-6 sm:left-7"
+        >
+          <div className="relative z-10 h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-sky-300 bg-[#0b152a] shadow-[0_6px_18px_rgba(2,132,199,0.45)] sm:h-12 sm:w-12">
+            <img
+              src="/assets/michael-hans-avatar.jpg"
+              alt="Michael Hans"
+              className="h-full w-full object-cover object-top"
+              draggable={false}
+            />
+          </div>
+          <div
+            className="-ml-4 flex items-baseline gap-1.5 border-2 border-sky-300/85 py-1 pl-6 pr-3.5 shadow-[0_8px_22px_rgba(2,132,199,0.4)] sm:-ml-5 sm:gap-2 sm:py-1.5 sm:pl-7 sm:pr-5"
+            style={{
+              background: 'linear-gradient(100deg, #071326 0%, #0e2e5c 52%, #083d77 100%)',
+              transform: 'skewX(-12deg)',
+            }}
+          >
+            <span
+              className="font-mono-tech text-[10px] font-bold tracking-wider text-sky-300 italic sm:text-xs"
+              style={{ transform: 'skewX(12deg)' }}
+            >
+              LP:
+            </span>
+            <span
+              className="font-mono-tech text-base font-extrabold tracking-tight text-white tabular-nums sm:text-xl"
+              style={{ transform: 'skewX(12deg)' }}
+            >
+              {lpValue}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* LAYER 1: 3D ANGLED STACKED DECK ON DUEL FIELD (GLIDES FROM BOTTOM-RIGHT SLOT -> CENTER!) */}
       <div
         ref={deckLayerRef}
@@ -586,6 +798,7 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         }`}
       >
         <div
+          id="tour-splash-deck"
           ref={deckStageRef}
           className="relative aspect-[59/86] w-[min(210px,52vw,calc(42dvh*59/86))] sm:w-[min(220px,49vw,calc(44dvh*59/86))]"
           style={{ perspective: '1150px' }}
@@ -752,6 +965,16 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Splash Guided Pointer + Duel Links Dialogue */}
+      <DuelGuideTour
+        open={splashTourOpen}
+        steps={SPLASH_TOUR_STEPS}
+        onClose={() => {
+          setSplashTourOpen(false)
+          setSplashTourDismissed(true)
+        }}
+      />
     </div>
   )
 }

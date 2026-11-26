@@ -132,7 +132,7 @@ export const PROFILE = {
   resumeUrl: '/assets/Magbojos_MichaelHans_Resume_CV.pdf',
   heroHeadline: 'Michael Hans Magbojos',
   heroBio:
-    'Fourth-year BSIT student and DOST-SEI Merit Scholar at FAITH Colleges. I build database-backed web apps, enforce security at the SQL layer, and ship internal manufacturing systems.',
+    "Hi, I'm Hans, a 4th-year BSIT student and DOST-SEI Scholar at FAITH Colleges. I spend most of my time building database-heavy web apps, writing SQL security rules, and shipping internal tools.",
 }
 
 export const STANDOUT_HIGHLIGHTS: StandoutHighlight[] = [
@@ -866,36 +866,5 @@ export const OJT_EXPERIENCE_PHOTOS: ExperiencePhotoHighlight[] = [
     label: 'Sir Lyndon Balois',
     caption: 'IT Senior Supervisor who reviewed GatePass & HRAD sprints',
     cardId: 'ref-lyndon',
-  },
-]
-
-export const FIELD_MILESTONE_PHOTOS: ExperiencePhotoHighlight[] = [
-  {
-    id: 'fld-insectra-defended',
-    src: insectraDefendedImg,
-    label: 'Capstone Defended',
-    caption: 'InsecTra solar IoT trap & AWS cloud platform successfully defended',
-    cardId: 'insectra',
-  },
-  {
-    id: 'fld-insectra-farm',
-    src: insectraFarmImg,
-    label: 'Live Farm Testing',
-    caption: 'Actual bitter gourd field deployment running YOLO11 on Raspberry Pi',
-    cardId: 'insectra',
-  },
-  {
-    id: 'fld-hackforgov',
-    src: hackforgovOfficialImg,
-    label: 'HackForGov 5 CTF',
-    caption: 'CALABARZON #1 Top Individual Scorer · Tagaytay City',
-    cardId: 'hackforgov',
-  },
-  {
-    id: 'fld-codechum',
-    src: codechumVictoryImg,
-    label: 'CodeChum 65/65',
-    caption: 'Perfect Java competition score celebrated with a Chickenjoy box',
-    cardId: 'isite-java',
   },
 ]

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { Check, ChevronUp, RotateCcw } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, ChevronUp, RotateCcw } from 'lucide-react'
 import bpExperienceDarkPreview from '../images/phase-previews/bp-experience-dark.png'
 import bpExperiencePreview from '../images/phase-previews/bp-experience.png'
 import dpDrawDarkPreview from '../images/phase-previews/dp-draw-dark.png'
@@ -123,6 +123,9 @@ interface PhaseCardTrayProps {
   theme: 'light' | 'dark'
   onSelectPhase: (phase: PortfolioPhase) => void
   onReplayDraw: () => void
+  onStepPhase?: (delta: -1 | 1) => void
+  canStepPrev?: boolean
+  canStepNext?: boolean
 }
 
 interface PvzFlyState {
@@ -231,7 +234,15 @@ function PhaseCardVisual({
   )
 }
 
-export function PhaseCardTray({ activePhase, theme, onSelectPhase, onReplayDraw }: PhaseCardTrayProps) {
+export function PhaseCardTray({
+  activePhase,
+  theme,
+  onSelectPhase,
+  onReplayDraw,
+  onStepPhase,
+  canStepPrev = true,
+  canStepNext = true,
+}: PhaseCardTrayProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [openAnimKey, setOpenAnimKey] = useState(0)
   const [pvzFly, setPvzFly] = useState<PvzFlyState | null>(null)
@@ -240,6 +251,7 @@ export function PhaseCardTray({ activePhase, theme, onSelectPhase, onReplayDraw 
   )
 
   const cardRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const trayTouchStartRef = useRef<{ x: number; y: number } | null>(null)
   const trayBodyRef = useRef<HTMLDivElement>(null)
   const pvzPortalRef = useRef<HTMLDivElement>(null)
   const pvzDimRef = useRef<HTMLDivElement>(null)
@@ -542,9 +554,29 @@ export function PhaseCardTray({ activePhase, theme, onSelectPhase, onReplayDraw 
         role="region"
         aria-label="Duel Phase Card Switcher"
       >
-        {/* Centered Prominent Toggle Handle ("Choose your tab") */}
-        <div className="relative z-10 -mb-[1px] flex justify-center">
+        {/* Centered Prominent Toggle Handle ("Choose your tab") + Mobile Quick Step Chevrons */}
+        <div className="relative z-10 -mb-[1px] flex items-end justify-center gap-1.5">
+          {!isOpen && onStepPhase && (
+            <button
+              type="button"
+              disabled={!canStepPrev}
+              onClick={() => {
+                duelSfx.playHover()
+                onStepPhase(-1)
+              }}
+              aria-label="Previous tab"
+              className={`pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-t-[4px] border border-b-0 backdrop-blur-md transition disabled:opacity-35 sm:hidden ${
+                isLight
+                  ? 'border-[#94a3b8] bg-[#ffffff]/94 text-[#181a1f]'
+                  : 'border-[#94a3b8]/70 bg-[#0d1322]/94 text-slate-100'
+              }`}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+          )}
+
           <button
+            id="tour-phase-dock"
             type="button"
             onClick={() => {
               duelSfx.playHover()
@@ -559,7 +591,7 @@ export function PhaseCardTray({ activePhase, theme, onSelectPhase, onReplayDraw 
               })
             }}
             aria-expanded={isOpen}
-            className={`pointer-events-auto group relative inline-flex items-center gap-2 rounded-t-[4px] border border-b-0 px-4 py-2 text-xs font-semibold tracking-wide backdrop-blur-md transition-all duration-200 sm:gap-3 sm:px-9 sm:py-3 sm:text-sm ${
+            className={`pointer-events-auto group relative inline-flex items-center gap-2 rounded-t-[4px] border border-b-0 px-3.5 py-2 text-xs font-semibold tracking-wide backdrop-blur-md transition-all duration-200 sm:gap-3 sm:px-9 sm:py-3 sm:text-sm ${
               isLight
                 ? 'border-[#94a3b8] bg-[#ffffff]/96 text-[#181a1f] shadow-[0_-8px_24px_rgba(15,23,42,0.12)] hover:border-[#475569] hover:bg-[#f8fafc]'
                 : 'border-[#94a3b8]/70 bg-[#0d1322]/96 text-slate-100 shadow-[0_-8px_24px_rgba(0,0,0,0.28)] hover:border-[#f1f5f9] hover:bg-[#131b30]'
@@ -580,7 +612,7 @@ export function PhaseCardTray({ activePhase, theme, onSelectPhase, onReplayDraw 
             />
             <span>Choose your tab</span>
             <span
-              className={`max-w-[116px] truncate rounded-[2px] border px-1.5 py-0.5 font-mono-tech text-[10px] font-medium sm:max-w-none sm:px-2 sm:text-[11px] ${
+              className={`max-w-[106px] truncate rounded-[2px] border px-1.5 py-0.5 font-mono-tech text-[10px] font-medium sm:max-w-none sm:px-2 sm:text-[11px] ${
                 isLight
                   ? 'border-[#cbd5e1] bg-[#eeebe2] text-[#181a1f]'
                   : 'border-white/15 bg-white/10 text-[#e2e8f0]'
@@ -594,6 +626,25 @@ export function PhaseCardTray({ activePhase, theme, onSelectPhase, onReplayDraw 
               } ${isOpen ? 'rotate-180' : 'rotate-0'}`}
             />
           </button>
+
+          {!isOpen && onStepPhase && (
+            <button
+              type="button"
+              disabled={!canStepNext}
+              onClick={() => {
+                duelSfx.playHover()
+                onStepPhase(1)
+              }}
+              aria-label="Next tab"
+              className={`pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-t-[4px] border border-b-0 backdrop-blur-md transition disabled:opacity-35 sm:hidden ${
+                isLight
+                  ? 'border-[#94a3b8] bg-[#ffffff]/94 text-[#181a1f]'
+                  : 'border-[#94a3b8]/70 bg-[#0d1322]/94 text-slate-100'
+              }`}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         {/* Full 90vw Docked Drawer Shell */}
@@ -672,7 +723,24 @@ export function PhaseCardTray({ activePhase, theme, onSelectPhase, onReplayDraw 
                     />
                   </button>
 
-                  <div className="flex flex-1 items-end justify-center gap-3 pt-2.5 sm:gap-5">
+                  <div
+                    onTouchStart={(e) => {
+                      const t = e.touches[0]
+                      trayTouchStartRef.current = { x: t.clientX, y: t.clientY }
+                    }}
+                    onTouchEnd={(e) => {
+                      const start = trayTouchStartRef.current
+                      trayTouchStartRef.current = null
+                      if (!start) return
+                      const t = e.changedTouches[0]
+                      const dx = t.clientX - start.x
+                      const dy = t.clientY - start.y
+                      if (Math.abs(dx) > 38 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+                        stepIndex(dx < 0 ? 1 : -1)
+                      }
+                    }}
+                    className="flex flex-1 items-end justify-center gap-3 pt-2.5 sm:gap-5"
+                  >
                     {visibleSlice.map((item, sliceIdx) => {
                       const cardIndex = PHASE_CARDS.findIndex((c) => c.id === item.id)
                       const isHighlighted = cardIndex === highlightedIdx

@@ -1,4 +1,7 @@
-import React from 'react'
+import React, { useMemo, useState } from 'react'
+import { ArrowUpRight } from 'lucide-react'
+import { DECK_CARDS, DeckCardItem } from '../data/deckData'
+import { duelSfx } from '../utils/sfx'
 
 interface ToolEntry {
   name: string
@@ -8,6 +11,15 @@ interface ToolEntry {
 interface ToolkitRow {
   category: string
   items: ToolEntry[]
+}
+
+interface SkillProofEntry {
+  summary: string
+  cardIds: string[]
+}
+
+interface TechToolkitProps {
+  onOpenCard: (cardId: string) => void
 }
 
 const BadgeSvg: React.FC<{ text: string }> = ({ text }) => (
@@ -169,9 +181,9 @@ const TOOLKIT_ROWS: ToolkitRow[] = [
   {
     category: 'Languages',
     items: [
-      { name: 'Java', icon: <JavaSvg /> },
       { name: 'C#', icon: <BadgeSvg text="C#" /> },
       { name: 'TypeScript', icon: <BadgeSvg text="TS" /> },
+      { name: 'Java', icon: <JavaSvg /> },
       { name: 'JavaScript', icon: <BadgeSvg text="JS" /> },
       { name: 'Python', icon: <PythonSvg /> },
       { name: 'SQL', icon: <DbSvg /> },
@@ -183,12 +195,12 @@ const TOOLKIT_ROWS: ToolkitRow[] = [
   {
     category: 'Frameworks & Databases',
     items: [
+      { name: 'ASP.NET Core', icon: <BadgeSvg text=".NET" /> },
       { name: 'Next.js', icon: <NextSvg /> },
       { name: 'React', icon: <ReactSvg /> },
       { name: 'React Native', icon: <ReactSvg /> },
       { name: 'Expo', icon: <ExpoSvg /> },
       { name: 'Tailwind CSS', icon: <TailwindSvg /> },
-      { name: 'ASP.NET Core', icon: <BadgeSvg text=".NET" /> },
       { name: 'PostgreSQL', icon: <DbSvg /> },
       { name: 'Supabase', icon: <SupabaseSvg /> },
       { name: 'MariaDB', icon: <DbSvg /> },
@@ -211,30 +223,239 @@ const TOOLKIT_ROWS: ToolkitRow[] = [
   },
 ]
 
-export const TechToolkit: React.FC = () => {
-  return (
-    <section className="space-y-4 sm:space-y-6">
-      <h2 className="font-mono-tech text-xs font-semibold tracking-[0.14em] text-[var(--accent-silver)] uppercase">
-        Technical Toolkit
-      </h2>
+const SKILL_PROOFS: Record<string, SkillProofEntry> = {
+  'C#': {
+    summary: 'My go-to backend language for internal manufacturing apps at Moriroku and the unified church API.',
+    cardIds: ['gatepass', 'hrad', 'howconnect'],
+  },
+  TypeScript: {
+    summary: 'Used across all 458 commits on BuildBid for typed forms, quote tables, and server actions.',
+    cardIds: ['buildbid'],
+  },
+  Java: {
+    summary: 'Got 65/65 (6th nationwide) at the ISITE-CodeChum competition and validated in TOPCIT.',
+    cardIds: ['isite-java', 'topcit'],
+  },
+  JavaScript: {
+    summary: 'Powers the client logic and interactive frontends on HowConnect and collaborative Vercel builds.',
+    cardIds: ['howconnect', 'collabs'],
+  },
+  Python: {
+    summary: 'Runs computer vision capture scripts on Raspberry Pi and the signature compression helper at Moriroku.',
+    cardIds: ['insectra', 'gatepass', 'hackforgov'],
+  },
+  SQL: {
+    summary: 'My daily focus: normalized table schemas, stored procedures, views, and strict RLS privacy rules.',
+    cardIds: ['buildbid', 'gatepass', 'hrad', 'howconnect', 'topcit'],
+  },
+  HTML: {
+    summary: 'Semantic markup and printable A6 slip layouts shipped across client and internship builds.',
+    cardIds: ['gatepass', 'collabs'],
+  },
+  CSS: {
+    summary: 'Fixed responsive layout bugs and built the UI framing across multiple live team sites.',
+    cardIds: ['collabs', 'buildbid'],
+  },
+  'C++': {
+    summary: 'Used during university data structures practice and algorithmic problem solving.',
+    cardIds: ['isite-java', 'topcit'],
+  },
+  'ASP.NET Core': {
+    summary: 'Shipped REST APIs and JWT auth flows on .NET 8 during my 248-hour internship at Moriroku.',
+    cardIds: ['gatepass', 'hrad', 'howconnect'],
+  },
+  'Next.js': {
+    summary: 'Built the full BuildBid marketplace frontend and route handlers across 72+ sprint phases.',
+    cardIds: ['buildbid'],
+  },
+  React: {
+    summary: 'Core UI layer behind BuildBid and several interactive web frontends.',
+    cardIds: ['buildbid', 'collabs'],
+  },
+  'React Native': {
+    summary: 'Built mobile companion apps for InsecTra farm monitoring and House of Worship LB.',
+    cardIds: ['insectra', 'howconnect'],
+  },
+  Expo: {
+    summary: 'Packaged Android builds and shared REST API sync for HoW Connect.',
+    cardIds: ['howconnect', 'insectra'],
+  },
+  'Tailwind CSS': {
+    summary: 'Styled responsive dashboards and mobile views on BuildBid without bloated CSS sheets.',
+    cardIds: ['buildbid'],
+  },
+  PostgreSQL: {
+    summary: 'Locked down rival bids and phone numbers right inside SQL Row Level Security policies.',
+    cardIds: ['buildbid', 'insectra'],
+  },
+  Supabase: {
+    summary: 'Handled auth, storage buckets, and Postgres RLS enforcement in production on BuildBid.',
+    cardIds: ['buildbid'],
+  },
+  MariaDB: {
+    summary: 'Backed Moriroku GatePass and HRAD ticketing with containerized schemas and stored procedures.',
+    cardIds: ['gatepass', 'hrad'],
+  },
+  'SQL Server': {
+    summary: 'Unified database for HowConnect plus Azure SQL setups on team web apps.',
+    cardIds: ['howconnect', 'collabs'],
+  },
+  AWS: {
+    summary: 'Deployed InsecTra across EC2, Application Load Balancer, Auto Scaling, RDS, and S3.',
+    cardIds: ['insectra'],
+  },
+  Azure: {
+    summary: 'Wired cloud SQL Server instances and app hosting for Gabay Halaman and StarQueen.',
+    cardIds: ['collabs'],
+  },
+  Docker: {
+    summary: 'Containerized both .NET 8 systems and MariaDB instances for predictable deployments.',
+    cardIds: ['gatepass', 'hrad'],
+  },
+  Nginx: {
+    summary: 'Configured reverse proxy routing in front of live API services on Linux servers.',
+    cardIds: ['insectra', 'gatepass'],
+  },
+  Git: {
+    summary: 'Daily branch management, conflict resolution, and CI checks across team repos.',
+    cardIds: ['buildbid', 'howconnect', 'collabs'],
+  },
+  GitHub: {
+    summary: 'Managed 458 commits, pull requests, and GitHub Actions test workflows.',
+    cardIds: ['buildbid', 'howconnect'],
+  },
+  'Raspberry Pi': {
+    summary: 'Set up the solar-powered field trap unit capturing images and syncing counts over mobile data.',
+    cardIds: ['insectra'],
+  },
+  YOLO11: {
+    summary: 'Trained and ran object detection to spot and count melon fruit flies right on the edge.',
+    cardIds: ['insectra'],
+  },
+  Vercel: {
+    summary: 'Shipped production web portals and team builds with fast preview links.',
+    cardIds: ['buildbid', 'howconnect', 'collabs'],
+  },
+}
 
-      <div className="space-y-5 sm:space-y-6">
-        {TOOLKIT_ROWS.map((row) => (
-          <div key={row.category} className="space-y-2.5">
-            <h3 className="text-sm font-medium text-[var(--text-main)]">{row.category}</h3>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 sm:gap-x-7 sm:gap-y-3">
-              {row.items.map((tool) => (
-                <div
-                  key={tool.name}
-                  className="inline-flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)] transition-colors hover:text-[var(--text-main)] sm:gap-2 sm:text-sm"
-                >
-                  {tool.icon}
-                  <span>{tool.name}</span>
-                </div>
-              ))}
+export const TechToolkit: React.FC<TechToolkitProps> = ({ onOpenCard }) => {
+  const [selectedSkill, setSelectedSkill] = useState<string>('C#')
+
+  const activeProof = SKILL_PROOFS[selectedSkill] ?? SKILL_PROOFS['C#']
+
+  const linkedCards = useMemo(() => {
+    return activeProof.cardIds
+      .map((id) => DECK_CARDS.find((card) => card.id === id))
+      .filter((card): card is DeckCardItem => Boolean(card))
+  }, [activeProof])
+
+  const activeIcon = useMemo(() => {
+    for (const row of TOOLKIT_ROWS) {
+      const match = row.items.find((t) => t.name === selectedSkill)
+      if (match) return match.icon
+    }
+    return null
+  }, [selectedSkill])
+
+  return (
+    <section id="tour-toolkit" className="space-y-4 sm:space-y-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="font-mono-tech text-xs font-semibold tracking-[0.14em] text-[var(--accent-silver)] uppercase">
+          Technical Toolkit
+        </h2>
+        <span className="text-xs text-[var(--text-muted)]">
+          Tap any skill to inspect matching cards
+        </span>
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr] lg:items-start lg:gap-6">
+        {/* Left: Clickable Skill Buttons */}
+        <div className="space-y-4 sm:space-y-5">
+          {TOOLKIT_ROWS.map((row) => (
+            <div key={row.category} className="space-y-2">
+              <h3 className="text-xs font-semibold tracking-wide text-[var(--text-main)] sm:text-sm">
+                {row.category}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {row.items.map((tool) => {
+                  const isActive = tool.name === selectedSkill
+                  const proofCount = SKILL_PROOFS[tool.name]?.cardIds.length ?? 0
+                  return (
+                    <button
+                      key={tool.name}
+                      type="button"
+                      aria-pressed={isActive}
+                      onClick={() => {
+                        duelSfx.playHover()
+                        setSelectedSkill(tool.name)
+                      }}
+                      className={`inline-flex items-center gap-1.5 rounded-[3px] border px-2.5 py-1.5 text-[12.5px] font-medium transition sm:px-3 sm:text-[13px] ${
+                        isActive
+                          ? 'border-[var(--accent-silver)] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] shadow-sm'
+                          : 'border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-main)]'
+                      }`}
+                    >
+                      {tool.icon}
+                      <span>{tool.name}</span>
+                      {proofCount > 0 && (
+                        <span
+                          className={`rounded-[2px] px-1 py-0.5 font-mono-tech text-[10px] leading-none ${
+                            isActive
+                              ? 'bg-white/20 text-current'
+                              : 'bg-[var(--bg-muted)] text-[var(--text-muted)]'
+                          }`}
+                        >
+                          {proofCount}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
+          ))}
+        </div>
+
+        {/* Right: Dynamic Proof Panel updating cleanly on skill selection */}
+        <div
+          key={selectedSkill}
+          className="ygo-media-fade rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 sm:p-5 lg:sticky lg:top-20"
+        >
+          <div className="flex items-center justify-between gap-3 border-b border-[var(--border-subtle)] pb-3">
+            <div className="flex items-center gap-2 text-[var(--text-main)]">
+              {activeIcon}
+              <h3 className="text-base font-semibold">{selectedSkill}</h3>
+            </div>
+            <span className="rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2 py-0.5 font-mono-tech text-[10.5px] font-medium text-[var(--text-secondary)]">
+              {linkedCards.length} {linkedCards.length === 1 ? 'card' : 'cards'}
+            </span>
           </div>
-        ))}
+
+          <p className="mt-3 text-[13px] leading-relaxed text-[var(--text-secondary)] sm:text-sm">
+            {activeProof.summary}
+          </p>
+
+          <div className="mt-4 space-y-2">
+            {linkedCards.map((card) => (
+              <button
+                key={card.id}
+                type="button"
+                onClick={() => onOpenCard(card.id)}
+                className="group flex w-full items-center justify-between gap-3 rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-muted)]/45 px-3 py-2.5 text-left transition hover:border-[var(--accent-silver)] hover:bg-[var(--bg-muted)]"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-[13.5px] font-semibold text-[var(--text-main)] group-hover:text-[var(--accent-silver)]">
+                    {card.title}
+                  </p>
+                  <p className="truncate font-mono-tech text-[11px] text-[var(--text-muted)]">
+                    {card.typeTag} · {card.subtitle}
+                  </p>
+                </div>
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--text-main)]" />
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   )

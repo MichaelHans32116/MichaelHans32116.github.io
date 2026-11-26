@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom'
 import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { duelSfx } from '../utils/sfx'
 import { DuelDeckBoxCard } from './DuelDeckBoxCard'
-import adAstraCampImg from '../images/web/ad-astra-camp.jpg'
 import boseQcUltraImg from '../images/web/bose-qc-ultra.jpg'
 import chessMatchImg from '../images/web/chess-match.jpg'
 import evangelismDrawingImg from '../images/web/evangelism-drawing.jpg'
@@ -57,7 +56,7 @@ const LIFE_DECKS: LifeDeckItem[] = [
     countSummary: 'Photos 4 · Faith & Piano',
     tagline: 'House of Worship LB, Sat Masili & Sun Sucol',
     story:
-      'I serve at House of Worship Los Baños as a Barangay Leader and church pianist. They are also the real client behind my HoW Connect web and mobile app. Saturdays are for Barangay Masili and Sundays are for Barangay Sucol, doing kids ministry and soul-winning outreach.',
+      'I play piano at House of Worship Los Baños and help lead barangay outreach. Funny enough, they are also the real client behind my HoW Connect app. Every Saturday I am in Barangay Masili and every Sunday in Barangay Sucol for kids ministry and house-to-house visits.',
     coverSrc: evangelismKidsImg,
     coverMode: 'cover-top',
     accent: '#2563eb',
@@ -93,10 +92,10 @@ const LIFE_DECKS: LifeDeckItem[] = [
     title: 'Friends & Food Trips',
     deckTypeLabel: 'SQUAD DECK',
     boxCode: 'SQUAD',
-    countSummary: 'Photos 4 · Friends & Camp',
-    tagline: 'Dinner runs, cafe hangs & Ad Astra camp',
+    countSummary: 'Photos 3 · Squad & Food',
+    tagline: 'Dinner runs, pizza nights & late cafes',
     story:
-      'Most of my best memories are just eating out with friends after exams and defenses, staying way too late at cafes, or figuring out tent poles at Ad Astra scholar camp.',
+      'Most of my favorite memories happen around crowded dinner tables after surviving exams or defenses, sharing pizza boxes, and hanging out at cafes until late.',
     coverSrc: friendsGroupImg,
     coverMode: 'cover-top',
     accent: '#0f766e',
@@ -119,12 +118,6 @@ const LIFE_DECKS: LifeDeckItem[] = [
         caption: 'Started as a normal hangout, ended up sketching app ideas again.',
         objectMode: 'cover-top',
       },
-      {
-        src: adAstraCampImg,
-        title: 'Ad Astra Scholar Camp',
-        caption: 'Setting up tent poles turned out harder than configuring Nginx.',
-        objectMode: 'cover-top',
-      },
     ],
   },
   {
@@ -135,7 +128,7 @@ const LIFE_DECKS: LifeDeckItem[] = [
     countSummary: 'Photos 3 · Dog & Art',
     tagline: 'Favorite dog Yuki & 21st birthday drawing',
     story:
-      'Yuki is my favorite dog and basically runs the house in her blue gingham dress. Next to her is my favorite artwork: a 21st birthday drawing I commissioned from one of my favorite people, with Yuki sitting right on top of the cake.',
+      'Yuki is my favorite dog and basically runs our house in her blue gingham dress. Right beside her is my favorite art piece: a 21st birthday drawing I commissioned from one of my favorite people, starring Yuki on top of the cake.',
     coverSrc: favoriteArtImg,
     coverMode: 'contain-art',
     accent: '#b45309',
@@ -168,7 +161,7 @@ const LIFE_DECKS: LifeDeckItem[] = [
     countSummary: 'Photos 4 · Audio & Games',
     tagline: 'Bose QC Ultra, Mjolnir 16cm, Chess & Genshin',
     story:
-      'Daily rotation outside dev work: Bose QuietComfort Ultra alongside my Sony WH-1000XM5 for locking in, my Mjolnir 16cm wide-frame pickleball paddle, over-the-board chess, and Genshin co-op with friends.',
+      'Outside dev work I rotate between my Bose QuietComfort Ultra and Sony WH-1000XM5 headphones, my Mjolnir 16cm wide-frame pickleball paddle, weekend chess, and Genshin co-op with friends.',
     coverSrc: boseQcUltraImg,
     coverMode: 'cover-center',
     accent: '#6d28d9',
@@ -208,6 +201,7 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
   const modalRef = useRef<HTMLDivElement>(null)
   const triggerElRef = useRef<HTMLElement | null>(null)
   const wasOpenRef = useRef(false)
+  const photoTouchStartRef = useRef<{ x: number; y: number } | null>(null)
 
   const activeDeck = activeDeckIdx !== null ? LIFE_DECKS[activeDeckIdx] ?? null : null
   const activePhoto = activeDeck ? activeDeck.photos[activePhotoIdx] ?? activeDeck.photos[0] : null
@@ -362,14 +356,31 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
                 </button>
               </div>
 
-              {/* LEFT COLUMN: Landscape Photo Stage + Photo Card Switcher */}
+              {/* LEFT COLUMN: Landscape Photo Stage + Swipe + Minimal Dot Indicators (no bloated pill bar) */}
               <div className="flex min-h-0 flex-col border-b border-[var(--border-subtle)] bg-[var(--bg-muted)]/45 md:border-b-0 md:border-r">
-                <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-3 sm:p-4">
+                <div
+                  onTouchStart={(e) => {
+                    const t = e.touches[0]
+                    photoTouchStartRef.current = { x: t.clientX, y: t.clientY }
+                  }}
+                  onTouchEnd={(e) => {
+                    const start = photoTouchStartRef.current
+                    photoTouchStartRef.current = null
+                    if (!start || activeDeck.photos.length <= 1) return
+                    const t = e.changedTouches[0]
+                    const dx = t.clientX - start.x
+                    const dy = t.clientY - start.y
+                    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) {
+                      stepPhoto(dx < 0 ? 1 : -1)
+                    }
+                  }}
+                  className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-3 sm:p-4"
+                >
                   <img
                     key={activePhoto.src}
                     src={activePhoto.src}
                     alt={activePhoto.title}
-                    className="ygo-media-fade h-auto max-h-[34dvh] w-auto max-w-full rounded-[2px] object-contain shadow-sm md:max-h-full"
+                    className="ygo-media-fade h-auto max-h-[36dvh] w-auto max-w-full rounded-[2px] object-contain shadow-sm md:max-h-full"
                   />
 
                   {activeDeck.photos.length > 1 && (
@@ -394,25 +405,26 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
                   )}
                 </div>
 
-                <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 px-3.5 py-2.5">
-                  {activeDeck.photos.map((photo, idx) => (
-                    <button
-                      key={photo.title}
-                      type="button"
-                      onClick={() => {
-                        duelSfx.playHover()
-                        setActivePhotoIdx(idx)
-                      }}
-                      className={`rounded-[2px] border px-2.5 py-1 text-[11px] font-medium transition ${
-                        idx === activePhotoIdx
-                          ? 'border-[var(--accent-silver)] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)]'
-                          : 'border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-main)]'
-                      }`}
-                    >
-                      {idx + 1}. {photo.title}
-                    </button>
-                  ))}
-                </div>
+                {activeDeck.photos.length > 1 && (
+                  <div className="flex shrink-0 items-center justify-center gap-2 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 px-4 py-2.5">
+                    {activeDeck.photos.map((photo, idx) => (
+                      <button
+                        key={photo.title}
+                        type="button"
+                        aria-label={`View ${photo.title}`}
+                        onClick={() => {
+                          duelSfx.playHover()
+                          setActivePhotoIdx(idx)
+                        }}
+                        className={`h-2 rounded-full transition-all ${
+                          idx === activePhotoIdx
+                            ? 'w-5 bg-[var(--accent-silver)]'
+                            : 'w-2 bg-[var(--border-hover)] hover:bg-[var(--text-secondary)]'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* RIGHT COLUMN: Story Info + Active Photo Caption + Desktop Deck Switcher */}
@@ -512,7 +524,7 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
           Outside the IDE.
         </h1>
         <p className="max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)] sm:text-[15px]">
-          When I step away from code, my weekends go to church keys, barangay outreach, food trips with friends, my dog Yuki, pickleball, chess, and Genshin co-op. Open any deck box below to see the cards inside.
+          Away from work, my weekends go to church piano, barangay outreach, food trips with friends, my dog Yuki, pickleball, chess, and Genshin co-op. Open any deck box to flip through the photos.
         </p>
       </section>
 

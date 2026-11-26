@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import {
   ArrowRight,
   Check,
+  Compass,
   Copy,
   Download,
   ExternalLink,
@@ -21,7 +22,9 @@ import { DeckCardModal } from './components/DeckCardModal'
 import { DrawPhase } from './components/DrawPhase'
 import { DuelDeckBoxCard } from './components/DuelDeckBoxCard'
 import { DuelFieldBg } from './components/DuelFieldBg'
+import { DuelGuideTour, GuideTourStep } from './components/DuelGuideTour'
 import { HoloYugiohCard } from './components/HoloYugiohCard'
+import { MobileHeaderMotion } from './components/MobileHeaderMotion'
 import { PhaseCardTray, PortfolioPhase } from './components/PhaseCardTray'
 import { TechToolkit } from './components/TechToolkit'
 import { ThemeFlipButton } from './components/ThemeFlipButton'
@@ -33,7 +36,6 @@ import {
   DeckCategory,
   EDUCATION_INFO,
   EXPERIENCE_HIGHLIGHTS,
-  FIELD_MILESTONE_PHOTOS,
   OJT_EXPERIENCE_PHOTOS,
   PROFILE,
   SIDE_WORK_ARCHIVE,
@@ -50,6 +52,39 @@ const NAV_PHASES: { id: PortfolioPhase; code: string; label: string; banner: str
   { id: 'main2', code: 'MP2', label: 'About Me', banner: 'MAIN PHASE 2' },
   { id: 'end', code: 'EP', label: 'Contact', banner: 'END PHASE' },
 ]
+
+const PORTFOLIO_TOUR_STEPS: GuideTourStep[] = [
+  {
+    id: 'home-card',
+    targetSelector: '#tour-hero-card',
+    speaker: 'Hans',
+    text: "Hey, I'm Hans! Tap my card anytime to flip it, or skim my intro right here.",
+    fallbackSide: 'bottom',
+  },
+  {
+    id: 'home-toolkit',
+    targetSelector: '#tour-toolkit',
+    speaker: 'Hans',
+    text: 'Click any skill in my toolkit and the proof panel beside it updates with the real systems I built.',
+    fallbackSide: 'top',
+  },
+  {
+    id: 'home-dock',
+    targetSelector: '#tour-phase-dock',
+    speaker: 'Hans',
+    text: 'Use this bottom dock (or swipe left and right on your phone) to move between Deck, Experience, About Me, and Contact.',
+    fallbackSide: 'top',
+  },
+  {
+    id: 'home-controls',
+    targetSelector: '#tour-controls',
+    speaker: 'Hans',
+    text: 'Switch Light and Dark theme, change Yu-Gi-Oh BGM tracks, or replay this guide anytime up here.',
+    fallbackSide: 'bottom',
+  },
+]
+
+const PORTFOLIO_TOUR_KEY = 'mh-portfolio-tour-v1'
 
 export function App() {
   const [stage, setStage] = useState<'draw' | 'portfolio'>('draw')
@@ -69,9 +104,11 @@ export function App() {
   const [bgmMode, setBgmMode] = useState<BgmMode>(() => duelSfx.getBgmMode())
   const [activeTrackId, setActiveTrackId] = useState<BgmTrackId>(() => duelSfx.getActiveTrackId())
   const [themeFlipDir, setThemeFlipDir] = useState<'to-dark' | 'to-light' | null>(null)
-  const [deckFilter, setDeckFilter] = useState<DeckCategory>('all')
+  const [deckFilter, setDeckFilter] = useState<DeckCategory>('projects')
   const [selectedCard, setSelectedCard] = useState<DeckCardItem | null>(null)
   const [modalScope, setModalScope] = useState<'deck' | 'standouts'>('deck')
+  const [portfolioTourOpen, setPortfolioTourOpen] = useState(false)
+  const [swipeHint, setSwipeHint] = useState<{ dir: 'prev' | 'next'; label: string } | null>(null)
   const [copiedField, setCopiedField] = useState<'email' | 'phone' | null>(null)
   const [contactName, setContactName] = useState('')
   const [contactEmail, setContactEmail] = useState('')
@@ -86,6 +123,7 @@ export function App() {
   const bannerTimerRef = useRef<number | null>(null)
   const themeFlipSwapRef = useRef<number | null>(null)
   const themeFlipEndRef = useRef<number | null>(null)
+  const mainTouchRef = useRef<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -174,6 +212,8 @@ export function App() {
 
   const switchPhase = useCallback((nextPhase: PortfolioPhase) => {
     setSelectedCard(null)
+    setPortfolioTourOpen(false)
+    setSwipeHint(null)
     setActivePhase(nextPhase)
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
     const meta = NAV_PHASES.find((p) => p.id === nextPhase)
@@ -187,6 +227,44 @@ export function App() {
       }, 780)
     }
   }, [])
+
+  const currentPhaseIdx = NAV_PHASES.findIndex((p) => p.id === activePhase)
+  const canStepPrev = currentPhaseIdx > 0
+  const canStepNext = currentPhaseIdx >= 0 && currentPhaseIdx < NAV_PHASES.length - 1
+
+  const stepPortfolioPhase = useCallback(
+    (delta: -1 | 1) => {
+      const idx = NAV_PHASES.findIndex((p) => p.id === activePhase)
+      if (idx === -1) return
+      const next = NAV_PHASES[idx + delta]
+      if (next) switchPhase(next.id)
+    },
+    [activePhase, switchPhase],
+  )
+
+  const closePortfolioTour = useCallback(() => {
+    setPortfolioTourOpen(false)
+    try {
+      window.localStorage.setItem(PORTFOLIO_TOUR_KEY, 'done')
+    } catch {
+      // ignore storage failure
+    }
+  }, [])
+
+  useEffect(() => {
+    if (stage !== 'portfolio' || activePhase !== 'standby') return
+    let seen = false
+    try {
+      seen = window.localStorage.getItem(PORTFOLIO_TOUR_KEY) === 'done'
+    } catch {
+      seen = false
+    }
+    if (seen) return
+    const timer = window.setTimeout(() => {
+      setPortfolioTourOpen(true)
+    }, 520)
+    return () => window.clearTimeout(timer)
+  }, [activePhase, stage])
 
   useEffect(() => {
     return () => {
@@ -456,6 +534,7 @@ export function App() {
       className="relative flex min-h-screen flex-col bg-[var(--bg-canvas)] text-[var(--text-main)]"
     >
       <DuelFieldBg variant="arena" />
+      <MobileHeaderMotion resetKey={activePhase} />
 
       {renderThemeFlipOverlay()}
 
@@ -464,7 +543,21 @@ export function App() {
         theme={theme}
         onSelectPhase={switchPhase}
         onReplayDraw={handleReplayDraw}
+        onStepPhase={stepPortfolioPhase}
+        canStepPrev={canStepPrev}
+        canStepNext={canStepNext}
       />
+
+      {swipeHint && (
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none fixed top-1/2 z-50 -translate-y-1/2 rounded-[3px] border border-[var(--accent-silver)]/70 bg-[var(--bg-surface)]/92 px-3 py-1.5 font-mono-tech text-[11px] font-semibold text-[var(--text-main)] shadow-lg backdrop-blur-md ${
+            swipeHint.dir === 'prev' ? 'left-3' : 'right-3'
+          }`}
+        >
+          {swipeHint.dir === 'prev' ? `← ${swipeHint.label}` : `${swipeHint.label} →`}
+        </div>
+      )}
 
       {/* Non-blocking Master Duel Phase Slash Banner */}
       {phaseBanner && (
@@ -479,9 +572,12 @@ export function App() {
         </div>
       )}
 
-      {/* Minimal Clean Top Header: Navigation lives in the bottom Choose your tab dock */}
-      <header className="sticky top-0 z-30 border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)]/92 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-8 sm:py-3.5">
+      {/* Minimal Clean Top Header: hides cleanly on phone downward scroll like InsecTra */}
+      <header
+        id="portfolio-topbar"
+        className="sticky top-0 z-30 border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)]/92 backdrop-blur-md"
+      >
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-3.5 py-2.5 sm:gap-4 sm:px-8 sm:py-3.5">
           <button
             type="button"
             onClick={() => {
@@ -495,7 +591,22 @@ export function App() {
           </button>
 
           {/* Utility Controls */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div id="tour-controls" className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                duelSfx.playHover()
+                if (activePhase !== 'standby') switchPhase('standby')
+                window.setTimeout(() => setPortfolioTourOpen(true), 120)
+              }}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs font-medium text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--text-main)] sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3 sm:py-1.5"
+              title="Guided page tour"
+              aria-label="Start guided page tour"
+            >
+              <Compass className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Tour</span>
+            </button>
+
             <button
               type="button"
               onClick={handleReplayDraw}
@@ -526,28 +637,83 @@ export function App() {
         </div>
       </header>
 
-      {/* ACTIVE PHASE VIEW */}
-      <main className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-5 py-8 sm:px-8 sm:py-14">
+      {/* ACTIVE PHASE VIEW (supports mobile swipe left/right between phases) */}
+      <main
+        onTouchStart={(e) => {
+          if (selectedCard || portfolioTourOpen || e.touches.length !== 1) return
+          const target = e.target as HTMLElement | null
+          if (target?.closest('input, textarea, select, [role="dialog"], [data-no-phase-swipe]')) return
+          const t = e.touches[0]
+          mainTouchRef.current = { x: t.clientX, y: t.clientY }
+        }}
+        onTouchMove={(e) => {
+          const start = mainTouchRef.current
+          if (!start || e.touches.length !== 1) return
+          const t = e.touches[0]
+          const dx = t.clientX - start.x
+          const dy = t.clientY - start.y
+          if (Math.abs(dx) > 22 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+            const targetIdx = dx > 0 ? currentPhaseIdx - 1 : currentPhaseIdx + 1
+            const nextMeta = NAV_PHASES[targetIdx]
+            if (nextMeta) {
+              setSwipeHint({ dir: dx > 0 ? 'prev' : 'next', label: nextMeta.label })
+            }
+          } else if (swipeHint) {
+            setSwipeHint(null)
+          }
+        }}
+        onTouchEnd={(e) => {
+          const start = mainTouchRef.current
+          mainTouchRef.current = null
+          setSwipeHint(null)
+          if (!start || e.changedTouches.length === 0) return
+          const t = e.changedTouches[0]
+          const dx = t.clientX - start.x
+          const dy = t.clientY - start.y
+          if (Math.abs(dx) > 58 && Math.abs(dx) > Math.abs(dy) * 1.65) {
+            stepPortfolioPhase(dx > 0 ? -1 : 1)
+          }
+        }}
+        onTouchCancel={() => {
+          mainTouchRef.current = null
+          setSwipeHint(null)
+        }}
+        className="relative z-10 mx-auto w-full max-w-5xl flex-1 px-4 py-6 sm:px-8 sm:py-12"
+      >
         <div ref={phaseContainerRef}>
           {/* =========================================================
-              SP · HOME (Calm Editorial Intro + Standouts + Education + TechToolkit)
+              SP · HOME (Direct Conversational Intro + Standouts + Education + Interactive Toolkit)
               ========================================================= */}
           {activePhase === 'standby' && (
-            <div className="space-y-12 sm:space-y-16 lg:space-y-20">
+            <div className="space-y-10 sm:space-y-14 lg:space-y-16">
               {/* Hero Intro */}
-              <section className="grid items-center gap-7 sm:gap-10 lg:grid-cols-[260px_1fr] lg:gap-14">
-                <div className="mx-auto w-[min(200px,54vw)] sm:w-[248px] lg:w-[260px]">
+              <section className="grid items-center gap-6 sm:gap-10 lg:grid-cols-[248px_1fr] lg:gap-12">
+                <div
+                  id="tour-hero-card"
+                  className="mx-auto w-[min(190px,52vw)] sm:w-[236px] lg:w-[248px]"
+                >
                   <HoloYugiohCard flippable />
                 </div>
 
-                <div className="space-y-5 text-center sm:space-y-6 lg:text-left">
-                  <div className="space-y-3 sm:space-y-3.5">
-                    <h1 className="font-editorial text-[2rem] leading-[1.12] text-[var(--text-main)] sm:text-5xl">
+                <div className="space-y-4 text-left sm:space-y-5">
+                  <div className="space-y-3">
+                    <h1 className="font-editorial text-[1.75rem] leading-[1.15] text-[var(--text-main)] sm:text-[2.6rem]">
                       {PROFILE.heroHeadline}
                     </h1>
-                    <p className="mx-auto max-w-2xl text-[14px] leading-[1.65] text-[var(--text-secondary)] sm:text-base lg:mx-0">
-                      {PROFILE.heroBio}{' '}
-                      Explore the{' '}
+                    <p className="max-w-2xl text-[14.5px] leading-[1.75] text-[var(--text-secondary)] sm:text-[15.5px]">
+                      I&apos;m a{' '}
+                      <span className="inline-flex items-center rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-1.5 py-0.5 font-mono-tech text-[12px] font-semibold text-[var(--text-main)]">
+                        full-stack
+                      </span>{' '}
+                      developer &amp; 4th-year DOST-SEI scholar at FAITH Colleges. I build{' '}
+                      <span className="inline-flex items-center rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-1.5 py-0.5 font-mono-tech text-[12px] font-semibold text-[var(--text-main)]">
+                        web &amp; mobile
+                      </span>{' '}
+                      apps with{' '}
+                      <span className="inline-flex items-center rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-1.5 py-0.5 font-mono-tech text-[12px] font-semibold text-[var(--text-main)]">
+                        SQL security
+                      </span>
+                      , shipped plant tools at Moriroku PH, and keep my work simple for the people using it. Check out my{' '}
                       <button
                         type="button"
                         onClick={() => {
@@ -711,9 +877,9 @@ export function App() {
                 </div>
               </section>
 
-              {/* Cham-Inspired Technical Toolkit with Monochrome Icons */}
+              {/* Interactive Technical Toolkit: Click any skill to inspect matching builds */}
               <div className="border-t border-[var(--border-subtle)] pt-8 sm:pt-12">
-                <TechToolkit />
+                <TechToolkit onOpenCard={openCardById} />
               </div>
 
               <div className="flex justify-center border-t border-[var(--border-subtle)] pt-6 sm:justify-end sm:pt-8">
@@ -1022,39 +1188,20 @@ export function App() {
                 </div>
               </section>
 
-              {/* Field Work & National Competitions Proof */}
-              <section className="space-y-4 border-t border-[var(--border-subtle)] pt-8 sm:space-y-5">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <h2 className="font-mono-tech text-xs font-semibold tracking-[0.14em] text-[var(--accent-silver)] uppercase">
-                    Field Deployments &amp; Competitions
-                  </h2>
-                  <span className="text-xs text-[var(--text-muted)]">Click to inspect full Yu-Gi-Oh! card</span>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {FIELD_MILESTONE_PHOTOS.map((shot) => (
-                    <button
-                      key={shot.id}
-                      type="button"
-                      onClick={() => openCardById(shot.cardId)}
-                      className="group flex flex-col overflow-hidden rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-left transition hover:-translate-y-0.5 hover:border-[var(--accent-silver)] hover:shadow-md"
-                    >
-                      <div className="aspect-[4/3] w-full overflow-hidden border-b border-[var(--border-subtle)] bg-[var(--bg-muted)]">
-                        <img
-                          src={shot.src}
-                          alt={shot.label}
-                          loading="lazy"
-                          className="h-full w-full object-cover object-top transition duration-300 group-hover:scale-[1.03]"
-                        />
-                      </div>
-                      <div className="p-3.5">
-                        <p className="text-sm font-semibold text-[var(--text-main)]">{shot.label}</p>
-                        <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-secondary)]">{shot.caption}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </section>
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] pt-6 sm:pt-8">
+                <button
+                  type="button"
+                  onClick={() => {
+                    duelSfx.playHover()
+                    setDeckFilter('projects')
+                    switchPhase('main')
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--accent-silver)] hover:underline"
+                >
+                  <span>Inspect InsecTra, HackForGov, and CodeChum cards in The Deck</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] pt-6 sm:pt-8">
                 <button
@@ -1332,6 +1479,12 @@ export function App() {
         onPrev={canStepModal ? handlePrevCard : undefined}
         onNext={canStepModal ? handleNextCard : undefined}
         positionLabel={canStepModal ? `${selectedIndex + 1} / ${activeModalCards.length}` : undefined}
+      />
+
+      <DuelGuideTour
+        open={portfolioTourOpen}
+        steps={PORTFOLIO_TOUR_STEPS}
+        onClose={closePortfolioTour}
       />
     </div>
   )

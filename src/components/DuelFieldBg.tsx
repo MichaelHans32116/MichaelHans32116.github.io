@@ -70,7 +70,7 @@ export const DuelFieldBg: React.FC<DuelFieldBgProps> = ({ variant = 'arena' }) =
   const cx = slotW / 2
   const cy = slotH / 2
 
-  const renderSlotCard = (src: string, opacity = 0.9) => (
+  const renderSlotCard = (src: string, opacity = 1) => (
     <g opacity={opacity}>
       <rect
         x="4"
@@ -81,7 +81,7 @@ export const DuelFieldBg: React.FC<DuelFieldBgProps> = ({ variant = 'arena' }) =
         fill="#0b0d12"
         stroke="var(--accent-silver)"
         strokeWidth="1.2"
-        strokeOpacity="0.55"
+        strokeOpacity="0.65"
       />
       <image
         href={src}
@@ -98,14 +98,13 @@ export const DuelFieldBg: React.FC<DuelFieldBgProps> = ({ variant = 'arena' }) =
 
   const perspectiveClass = isSplash
     ? isCompact
-      ? 'duel-field-perspective-mobile opacity-90'
-      : 'duel-field-perspective opacity-90'
+      ? 'duel-field-perspective-mobile opacity-100'
+      : 'duel-field-perspective opacity-100'
     : 'opacity-[0.26]'
 
-  const maskValue = isCompact
-    ? 'none'
-    : isSplash
-      ? 'radial-gradient(ellipse 94% 90% at 50% 50%, rgba(0,0,0,0.96) 58%, transparent 100%)'
+  const maskValue =
+    isSplash || isCompact
+      ? 'none'
       : 'radial-gradient(ellipse 84% 78% at 50% 49%, rgba(0,0,0,0.95) 34%, transparent 88%)'
 
   return (
@@ -226,7 +225,7 @@ export const DuelFieldBg: React.FC<DuelFieldBgProps> = ({ variant = 'arena' }) =
               stroke="var(--zone-field)"
               strokeWidth="1.2"
             />
-            {isSplash && renderSlotCard(adAstraCard, 0.88)}
+            {isSplash && renderSlotCard(adAstraCard, 1)}
           </g>
 
           {/* Extra Deck Zone (Left-Bottom Row): Facedown Stack on Splash */}
@@ -270,91 +269,94 @@ export const DuelFieldBg: React.FC<DuelFieldBgProps> = ({ variant = 'arena' }) =
                   rx="2"
                   fill="#171009"
                   stroke="#94a3b8"
-                  strokeOpacity="0.3"
+                  strokeOpacity="0.35"
                 />
-                {renderSlotCard(cardBackImg, 0.86)}
+                {renderSlotCard(cardBackImg, 0.98)}
               </>
             )}
           </g>
 
-          {/* 5 Main Monster Zones */}
-          {mmzX.map((x, idx) => {
-            const placed = isSplash ? MONSTER_SLOT_CARDS[idx] : undefined
-            return (
-              <g key={`mmz-${x}`} transform={`translate(${x}, ${row1Y})`}>
-                <rect
-                  x="0"
-                  y="0"
-                  width={slotW}
-                  height={slotH}
-                  rx="4"
-                  fill="none"
-                  stroke="var(--zone-monster)"
-                  strokeWidth="1.8"
-                />
-                <path
-                  d={cornerMarksD}
-                  fill="none"
-                  stroke="var(--zone-monster)"
-                  strokeWidth="1.5"
-                />
-                <rect
-                  x={cx - 40}
-                  y={cy - 40}
-                  width="80"
-                  height="80"
-                  rx="2"
-                  fill="none"
-                  stroke="var(--zone-monster)"
-                  strokeWidth="0.9"
-                  opacity="0.7"
-                />
-                {placed && renderSlotCard(placed.src, 0.82)}
-              </g>
-            )
-          })}
-
-          {/* 5 Spell / Trap Zones (+ Left Blue Pendulum & Right Red Pendulum Markers) */}
-          {mmzX.map((x, idx) => {
-            const placed = isSplash ? ST_SLOT_CARDS[idx] : undefined
-            return (
-              <g key={`stz-${x}`} transform={`translate(${x}, ${row2Y})`}>
-                <rect
-                  x="0"
-                  y="0"
-                  width={slotW}
-                  height={slotH}
-                  rx="4"
-                  fill="none"
-                  stroke="var(--zone-st)"
-                  strokeWidth="1.8"
-                />
-                <path
-                  d={cornerMarksD}
-                  fill="none"
-                  stroke="var(--zone-st)"
-                  strokeWidth="1.4"
-                />
-                {idx === 0 && (
-                  <polygon
-                    points={`${cx - 20},${cy} ${cx + 16},${cy - 24} ${cx + 16},${cy + 24}`}
+          {/* Center Anchor for Monster + Spell/Trap Rows */}
+          <g id={isSplash ? 'duel-field-cards-anchor' : undefined}>
+            {/* 5 Main Monster Zones */}
+            {mmzX.map((x, idx) => {
+              const placed = isSplash ? MONSTER_SLOT_CARDS[idx] : undefined
+              return (
+                <g key={`mmz-${x}`} transform={`translate(${x}, ${row1Y})`}>
+                  <rect
+                    x="0"
+                    y="0"
+                    width={slotW}
+                    height={slotH}
+                    rx="4"
                     fill="none"
                     stroke="var(--zone-monster)"
-                    strokeWidth="1.6"
+                    strokeWidth="1.8"
                   />
-                )}
-                {idx === 4 && (
-                  <polygon
-                    points={`${cx + 20},${cy} ${cx - 16},${cy - 24} ${cx - 16},${cy + 24}`}
+                  <path
+                    d={cornerMarksD}
+                    fill="none"
+                    stroke="var(--zone-monster)"
+                    strokeWidth="1.5"
+                  />
+                  <rect
+                    x={cx - 40}
+                    y={cy - 40}
+                    width="80"
+                    height="80"
+                    rx="2"
+                    fill="none"
+                    stroke="var(--zone-monster)"
+                    strokeWidth="0.9"
+                    opacity="0.7"
+                  />
+                  {placed && renderSlotCard(placed.src, 0.98)}
+                </g>
+              )
+            })}
+
+            {/* 5 Spell / Trap Zones (+ Left Blue Pendulum & Right Red Pendulum Markers) */}
+            {mmzX.map((x, idx) => {
+              const placed = isSplash ? ST_SLOT_CARDS[idx] : undefined
+              return (
+                <g key={`stz-${x}`} transform={`translate(${x}, ${row2Y})`}>
+                  <rect
+                    x="0"
+                    y="0"
+                    width={slotW}
+                    height={slotH}
+                    rx="4"
                     fill="none"
                     stroke="var(--zone-st)"
-                    strokeWidth="1.6"
+                    strokeWidth="1.8"
                   />
-                )}
-                {placed && renderSlotCard(placed.src, 0.85)}
-              </g>
-            )
-          })}
+                  <path
+                    d={cornerMarksD}
+                    fill="none"
+                    stroke="var(--zone-st)"
+                    strokeWidth="1.4"
+                  />
+                  {idx === 0 && (
+                    <polygon
+                      points={`${cx - 20},${cy} ${cx + 16},${cy - 24} ${cx + 16},${cy + 24}`}
+                      fill="none"
+                      stroke="var(--zone-monster)"
+                      strokeWidth="1.6"
+                    />
+                  )}
+                  {idx === 4 && (
+                    <polygon
+                      points={`${cx + 20},${cy} ${cx - 16},${cy - 24} ${cx - 16},${cy + 24}`}
+                      fill="none"
+                      stroke="var(--zone-st)"
+                      strokeWidth="1.6"
+                    />
+                  )}
+                  {placed && renderSlotCard(placed.src, 1)}
+                </g>
+              )
+            })}
+          </g>
 
           {/* Graveyard Zone (Right-Top Row) */}
           <g transform={`translate(${deckX}, ${row1Y})`}>
@@ -377,7 +379,7 @@ export const DuelFieldBg: React.FC<DuelFieldBgProps> = ({ variant = 'arena' }) =
               strokeWidth="1.2"
               strokeDasharray="6 4"
             />
-            {isSplash && renderSlotCard(dostCard, 0.56)}
+            {isSplash && renderSlotCard(dostCard, 0.85)}
           </g>
 
           {/* Main Deck Zone (Right-Bottom Row): Starting anchor for the 3D Deck Glide */}
