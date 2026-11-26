@@ -1,8 +1,14 @@
-// Synthesized Web Audio micro-SFX (zero external asset bloat, muted by default).
+// Clean MP3 sound + Passionate Duelist OST engine using real files from public/sfx/ (muted by default).
+// Fails gracefully if the user hasn't dropped MP3 files yet — zero synthetic beeps.
 
-class DuelAudioEngine {
-  private ctx: AudioContext | null = null
+const BGM_SRC = '/sfx/passionate-duelist.mp3'
+const BGM_TARGET_VOLUME = 0.22
+
+class DeckAudioEngine {
   private enabled = false
+  private cache: Record<string, HTMLAudioElement> = {}
+  private bgm: HTMLAudioElement | null = null
+  private fadeTimer: number | null = null
 
   public isEnabled(): boolean {
     return this.enabled
@@ -11,151 +17,115 @@ class DuelAudioEngine {
   public setEnabled(next: boolean): void {
     this.enabled = next
     if (next) {
-      this.ensureContext()
-      this.playClick()
+      this.play('/sfx/card-hover.mp3', 0.35)
+      this.startBgm()
+    } else {
+      this.stopBgm()
     }
   }
 
-  private ensureContext(): AudioContext | null {
-    if (typeof window === 'undefined') return null
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-      if (!AudioCtx) return null
-      this.ctx = new AudioCtx()
-    }
-    if (this.ctx.state === 'suspended') {
-      void this.ctx.resume()
-    }
-    return this.ctx
+  public ensureBgmPlaying(): void {
+    if (!this.enabled || typeof window === 'undefined') return
+    if (this.bgm && !this.bgm.paused) return
+    this.startBgm()
   }
 
-  // Crisp paper-card swoosh off the deck
-  public playDraw(): void {
-    if (!this.enabled) return
-    const ctx = this.ensureContext()
-    if (!ctx) return
-
-    const now = ctx.currentTime
-    const duration = 0.22
-    const bufferSize = Math.floor(ctx.sampleRate * duration)
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
-    const data = buffer.getChannelData(0)
-    for (let i = 0; i < bufferSize; i++) {
-      const env = Math.sin((i / bufferSize) * Math.PI)
-      data[i] = (Math.random() * 2 - 1) * env * 0.35
+  private clearFade(): void {
+    if (this.fadeTimer !== null && typeof window !== 'undefined') {
+      window.clearInterval(this.fadeTimer)
+      this.fadeTimer = null
     }
-
-    const noise = ctx.createBufferSource()
-    noise.buffer = buffer
-
-    const filter = ctx.createBiquadFilter()
-    filter.type = 'bandpass'
-    filter.frequency.setValueAtTime(900, now)
-    filter.frequency.exponentialRampToValueAtTime(3200, now + duration)
-    filter.Q.value = 1.6
-
-    const gain = ctx.createGain()
-    gain.gain.setValueAtTime(0.001, now)
-    gain.gain.exponentialRampToValueAtTime(0.28, now + 0.05)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
-
-    noise.connect(filter)
-    filter.connect(gain)
-    gain.connect(ctx.destination)
-    noise.start(now)
   }
 
-  // Sharp metallic snap on 3D card reveal flip
+  private startBgm(): void {
+    if (!this.enabled || typeof window === 'undefined') return
+    try {
+      if (!this.bgm) {
+        const audio = new Audio(BGM_SRC)
+        audio.loop = true
+        audio.preload = 'auto'
+        audio.volume = 0
+        this.bgm = audio
+      }
+
+      const audio = this.bgm
+      this.clearFade()
+      audio.volume = 0
+      void audio
+        .play()
+        .then(() => {
+          let step = 0
+          const steps = 15 // ~600ms smooth fade-in
+          this.fadeTimer = window.setInterval(() => {
+            if (!this.enabled || !this.bgm) {
+              this.clearFade()
+              return
+            }
+            step += 1
+            const nextVol = Math.min(BGM_TARGET_VOLUME, (BGM_TARGET_VOLUME * step) / steps)
+            this.bgm.volume = nextVol
+            if (step >= steps) {
+              this.clearFade()
+            }
+          }, 40)
+        })
+        .catch(() => {
+          // Ignore missing BGM file or browser autoplay restriction until next user gesture
+        })
+    } catch {
+      // Ignore environments without HTMLAudioElement
+    }
+  }
+
+  private stopBgm(): void {
+    this.clearFade()
+    if (this.bgm) {
+      try {
+        this.bgm.pause()
+      } catch {
+        // ignore pause failure
+      }
+    }
+  }
+
+  private play(src: string, volume = 0.65): void {
+    if (!this.enabled || typeof window === 'undefined') return
+    try {
+      let base = this.cache[src]
+      if (!base) {
+        base = new Audio(src)
+        base.preload = 'auto'
+        this.cache[src] = base
+      }
+      const clip = base.cloneNode(true) as HTMLAudioElement
+      clip.volume = volume
+      void clip.play().catch(() => {
+        // Ignore missing audio file or browser autoplay restriction silently
+      })
+    } catch {
+      // Ignore environments without HTMLAudioElement
+    }
+  }
+
+  public playPull(): void {
+    this.ensureBgmPlaying()
+    this.play('/sfx/card-pull.mp3', 0.72)
+  }
+
+  public playReveal(): void {
+    this.ensureBgmPlaying()
+    this.play('/sfx/card-reveal.mp3', 0.75)
+  }
+
   public playFlip(): void {
-    if (!this.enabled) return
-    const ctx = this.ensureContext()
-    if (!ctx) return
-
-    const now = ctx.currentTime
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-
-    osc.type = 'triangle'
-    osc.frequency.setValueAtTime(520, now)
-    osc.frequency.exponentialRampToValueAtTime(1180, now + 0.08)
-
-    gain.gain.setValueAtTime(0.14, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14)
-
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.start(now)
-    osc.stop(now + 0.15)
+    this.ensureBgmPlaying()
+    this.play('/sfx/card-pull.mp3', 0.5)
   }
 
-  // Resonant low-gold chord when summoning to the Main Field
-  public playSummon(): void {
-    if (!this.enabled) return
-    const ctx = this.ensureContext()
-    if (!ctx) return
-
-    const now = ctx.currentTime
-    const freqs = [196, 293.66, 392, 587.33] // G3, D4, G4, D5 open fifth resonance
-    freqs.forEach((f, idx) => {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.type = idx === 0 ? 'sine' : 'triangle'
-      osc.frequency.setValueAtTime(f, now + idx * 0.03)
-
-      gain.gain.setValueAtTime(0.001, now + idx * 0.03)
-      gain.gain.linearRampToValueAtTime(idx === 0 ? 0.16 : 0.07, now + idx * 0.03 + 0.03)
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55)
-
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.start(now + idx * 0.03)
-      osc.stop(now + 0.58)
-    })
-  }
-
-  // Minimal tactile UI tick
-  public playClick(): void {
-    if (!this.enabled) return
-    const ctx = this.ensureContext()
-    if (!ctx) return
-
-    const now = ctx.currentTime
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.type = 'sine'
-    osc.frequency.setValueAtTime(740, now)
-    osc.frequency.exponentialRampToValueAtTime(420, now + 0.035)
-
-    gain.gain.setValueAtTime(0.08, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04)
-
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.start(now)
-    osc.stop(now + 0.045)
-  }
-
-  // Subtle terminal return chime
-  public playTerminal(): void {
-    if (!this.enabled) return
-    const ctx = this.ensureContext()
-    if (!ctx) return
-
-    const now = ctx.currentTime
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
-    osc.type = 'square'
-    osc.frequency.setValueAtTime(880, now)
-    osc.frequency.setValueAtTime(1100, now + 0.03)
-
-    gain.gain.setValueAtTime(0.035, now)
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08)
-
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.start(now)
-    osc.stop(now + 0.085)
+  public playHover(): void {
+    this.ensureBgmPlaying()
+    this.play('/sfx/card-hover.mp3', 0.35)
   }
 }
 
-export const duelSfx = new DuelAudioEngine()
+export const duelSfx = new DeckAudioEngine()
