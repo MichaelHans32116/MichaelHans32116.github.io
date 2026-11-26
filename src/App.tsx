@@ -15,9 +15,8 @@ import {
   RotateCcw,
   Send,
   Sun,
-  Volume2,
-  VolumeX,
 } from 'lucide-react'
+import { AudioControls } from './components/AudioControls'
 import { DeckCard } from './components/DeckCard'
 import { DeckCardModal } from './components/DeckCardModal'
 import { DrawPhase } from './components/DrawPhase'
@@ -54,7 +53,9 @@ export function App() {
     const saved = window.localStorage.getItem('mh-theme')
     return saved === 'dark' ? 'dark' : 'light'
   })
-  const [sfxEnabled, setSfxEnabled] = useState(false)
+  const [sfxEnabled, setSfxEnabled] = useState(() => duelSfx.isSfxEnabled())
+  const [bgmMuted, setBgmMuted] = useState(() => duelSfx.isBgmMuted())
+  const [bgmVolume, setBgmVolume] = useState(() => duelSfx.getBgmVolume())
   const [deckFilter, setDeckFilter] = useState<DeckCategory>('all')
   const [selectedCard, setSelectedCard] = useState<DeckCardItem | null>(null)
   const [copiedField, setCopiedField] = useState<'email' | 'phone' | null>(null)
@@ -86,9 +87,24 @@ export function App() {
   const toggleSfx = useCallback(() => {
     setSfxEnabled((prev) => {
       const next = !prev
-      duelSfx.setEnabled(next)
+      duelSfx.setSfxEnabled(next)
       return next
     })
+  }, [])
+
+  const toggleBgmMute = useCallback(() => {
+    setBgmMuted((prev) => {
+      const next = !prev
+      duelSfx.setBgmMuted(next)
+      setBgmVolume(duelSfx.getBgmVolume())
+      return next
+    })
+  }, [])
+
+  const changeBgmVolume = useCallback((vol: number) => {
+    duelSfx.setBgmVolume(vol)
+    setBgmVolume(duelSfx.getBgmVolume())
+    setBgmMuted(duelSfx.isBgmMuted())
   }, [])
 
   const handleEnterPortfolio = useCallback(() => {
@@ -217,7 +233,11 @@ export function App() {
       <DrawPhase
         onEnterPortfolio={handleEnterPortfolio}
         sfxEnabled={sfxEnabled}
+        bgmMuted={bgmMuted}
+        bgmVolume={bgmVolume}
         onToggleSfx={toggleSfx}
+        onToggleBgmMute={toggleBgmMute}
+        onChangeBgmVolume={changeBgmVolume}
         theme={theme}
         onToggleTheme={toggleTheme}
       />
@@ -253,6 +273,7 @@ export function App() {
 
       <PhaseCardTray
         activePhase={activePhase}
+        theme={theme}
         onSelectPhase={switchPhase}
         onReplayDraw={handleReplayDraw}
       />
@@ -336,15 +357,15 @@ export function App() {
               {theme === 'light' ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
             </button>
 
-            <button
-              type="button"
-              onClick={toggleSfx}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--text-main)]"
-              title={sfxEnabled ? 'Mute OST & SFX' : 'Enable OST & SFX'}
-              aria-label="Toggle sound effects and music"
-            >
-              {sfxEnabled ? <Volume2 className="h-3.5 w-3.5 text-[var(--accent-silver)]" /> : <VolumeX className="h-3.5 w-3.5" />}
-            </button>
+            <AudioControls
+              compact
+              bgmMuted={bgmMuted}
+              bgmVolume={bgmVolume}
+              sfxEnabled={sfxEnabled}
+              onToggleBgmMute={toggleBgmMute}
+              onChangeBgmVolume={changeBgmVolume}
+              onToggleSfx={toggleSfx}
+            />
           </div>
         </div>
 
@@ -765,11 +786,14 @@ export function App() {
                 {/* Left Column: Editorial Heading + Minimal Contact Links */}
                 <div className="space-y-6">
                   <div className="space-y-3">
+                    <p className="font-mono-tech text-[11px] font-semibold tracking-[0.16em] text-[var(--accent-silver)] uppercase">
+                      END PHASE · OPEN FOR 600-HOUR OJT
+                    </p>
                     <h1 className="font-editorial text-4xl text-[var(--text-main)] sm:text-[42px]">
-                      Let&rsquo;s get in touch
+                      Your turn &mdash; let&rsquo;s build.
                     </h1>
                     <p className="max-w-md text-sm leading-relaxed text-[var(--text-secondary)]">
-                      Send me a message about 600-hour BSIT internship opportunities, software engineering roles, or technical interviews.
+                      Got an internship slot, a backend challenge, or a production system that needs steady hands? Drop a note directly and I&rsquo;ll get right back to you.
                     </p>
                     <p className="font-mono-tech text-xs text-[var(--text-muted)]">
                       {PROFILE.ojtWindow} · {PROFILE.location}

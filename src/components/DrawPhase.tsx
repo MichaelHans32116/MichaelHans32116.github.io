@@ -1,14 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { ArrowDown, Moon, RotateCcw, Sun, Volume2, VolumeX } from 'lucide-react'
+import { ArrowDown, Moon, RotateCcw, Sun } from 'lucide-react'
 import { duelSfx } from '../utils/sfx'
+import { AudioControls } from './AudioControls'
 import { DuelFieldBg } from './DuelFieldBg'
 import { backCardUrl, frontCardUrl, HoloYugiohCard } from './HoloYugiohCard'
 
 interface DrawPhaseProps {
   onEnterPortfolio: () => void
   sfxEnabled: boolean
+  bgmMuted: boolean
+  bgmVolume: number
   onToggleSfx: () => void
+  onToggleBgmMute: () => void
+  onChangeBgmVolume: (vol: number) => void
   theme: 'light' | 'dark'
   onToggleTheme: () => void
 }
@@ -25,7 +30,11 @@ const SUMMON_SPARKS = Array.from({ length: 18 }).map((_, idx) => ({
 export const DrawPhase: React.FC<DrawPhaseProps> = ({
   onEnterPortfolio,
   sfxEnabled,
+  bgmMuted,
+  bgmVolume,
   onToggleSfx,
+  onToggleBgmMute,
+  onChangeBgmVolume,
   theme,
   onToggleTheme,
 }) => {
@@ -141,11 +150,13 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         opacity: 1,
         duration: 0.78,
         ease: 'back.out(1.65)',
+        onStart: () => {
+          duelSfx.playReveal()
+          duelSfx.ensureBgmPlaying()
+        },
       })
       .call(
         () => {
-          duelSfx.playReveal()
-          duelSfx.ensureBgmPlaying()
           setBurstKey((k) => k + 1)
         },
         undefined,
@@ -410,15 +421,14 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
           {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
         </button>
 
-        <button
-          type="button"
-          onClick={onToggleSfx}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] shadow-sm transition hover:border-[var(--border-hover)] hover:text-[var(--text-main)]"
-          title={sfxEnabled ? 'Mute Passionate Duelist OST & SFX' : 'Enable Passionate Duelist OST & SFX'}
-          aria-label="Toggle sound effects and background music"
-        >
-          {sfxEnabled ? <Volume2 className="h-4 w-4 text-[var(--accent-silver)]" /> : <VolumeX className="h-4 w-4" />}
-        </button>
+        <AudioControls
+          bgmMuted={bgmMuted}
+          bgmVolume={bgmVolume}
+          sfxEnabled={sfxEnabled}
+          onToggleBgmMute={onToggleBgmMute}
+          onChangeBgmVolume={onChangeBgmVolume}
+          onToggleSfx={onToggleSfx}
+        />
 
         {phase === 'idle' && (
           <button
