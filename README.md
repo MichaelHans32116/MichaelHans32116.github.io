@@ -1,26 +1,21 @@
-# Michael Hans Magbojos Portfolio
+# Michael Hans G. Magbojos — Duelist Developer Portfolio
 
-Lightweight static portfolio for GitHub Pages.
+Interactive Yu-Gi-Oh!-inspired developer portfolio built with **React 19, TypeScript, Tailwind CSS v4, and GSAP**, featuring a 60fps 3D deck-draw opening, code-rendered holographic cards with real project logos/screenshots, a 3D shadowbox Ace Card, a 1-click **Recruiter View**, and a non-overlapping `hans@duel-disk ~ $` command-line terminal.
 
-## Deploy to GitHub Pages
+## Local Development
 
-1. Create a GitHub repository named `MichaelHans32116.github.io`.
-2. Copy everything inside this folder into that repository.
-3. Commit and push to the `main` branch.
-4. Open `https://michaelhans32116.github.io/` after GitHub Pages finishes building.
+```bash
+npm install
+npm run dev
+```
 
-## What to update later
+## Production Build & GitHub Pages Deploy
 
-- Add your exact LinkedIn URL in the contact section when ready.
-- Replace private/case-study notes with public links when repositories are safe to share.
-- Add more screenshots under `assets/projects/` when projects become public.
-- Use a redacted resume PDF only if you want a public download; the current attached resume includes phone/address details.
+```bash
+npm run build
+npm run preview
+```
 
-## Source notes
-
-Content was drafted from:
-
-- `C:/Users/ivanlaurente/Downloads/Magbojos_Resume.pdf`
-- `https://github.com/MichaelHans32116`
-- `https://github.com/hans32116`
-- Public project URLs listed in the resume and portfolio brief
+When ready to publish on `https://michaelhans32116.github.io/`:
+1. Merge branch `redesign/yugioh-duelist` into `main` and push.
+2. In GitHub repo **Settings -> Pages -> Build and deployment**, set **Source** to **GitHub Actions** (uses `.github/workflows/deploy.yml`).

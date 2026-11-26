@@ -1,0 +1,728 @@
+@import "tailwindcss";
+
+:root,
+[data-theme="light"] {
+  --bg-canvas: #f6f4ee;
+  --bg-surface: #ffffff;
+  --bg-muted: #eeebe2;
+  --border-subtle: #dedad0;
+  --border-hover: #b8b1a2;
+  --text-main: #181a1f;
+  --text-secondary: #4e5460;
+  --text-muted: #767d8a;
+  --accent-silver: #647081;
+  --accent-silver-bright: #94a3b8;
+  --accent-silver-glow: rgba(148, 163, 184, 0.36);
+  --zone-monster: rgba(120, 114, 98, 0.14);
+  --zone-st: rgba(120, 114, 98, 0.14);
+  --zone-field: rgba(100, 112, 129, 0.16);
+  --zone-deck: rgba(100, 112, 129, 0.22);
+  --splash-aura-1: rgba(120, 114, 98, 0.06);
+  --splash-aura-2: rgba(148, 163, 184, 0.14);
+  --logo-flame-top: #dc2626;
+  --logo-flame-mid: #b91c1c;
+  --logo-flame-dark: #5c0b12;
+  --logo-stroke: #161110;
+  --btn-primary-bg: #181a1f;
+  --btn-primary-text: #ffffff;
+  --card-shadow: 0 18px 40px -16px rgba(17, 24, 39, 0.24);
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'EB Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-ygo-title: 'Cinzel', Georgia, serif;
+  --font-ygo-body: 'EB Garamond', Georgia, serif;
+}
+
+[data-theme="dark"] {
+  --bg-canvas: #0b0e14;
+  --bg-surface: #121620;
+  --bg-muted: #181d29;
+  --border-subtle: #242b3a;
+  --border-hover: #3b455b;
+  --text-main: #eef0f5;
+  --text-secondary: #a4acb9;
+  --text-muted: #707989;
+  --accent-silver: #cbd5e1;
+  --accent-silver-bright: #f1f5f9;
+  --accent-silver-glow: rgba(203, 213, 225, 0.34);
+  --zone-monster: rgba(148, 163, 184, 0.14);
+  --zone-st: rgba(148, 163, 184, 0.14);
+  --zone-field: rgba(203, 213, 225, 0.17);
+  --zone-deck: rgba(203, 213, 225, 0.22);
+  --splash-aura-1: rgba(148, 163, 184, 0.08);
+  --splash-aura-2: rgba(203, 213, 225, 0.11);
+  --logo-flame-top: #ef4444;
+  --logo-flame-mid: #b91c1c;
+  --logo-flame-dark: #450a0a;
+  --logo-stroke: #05070d;
+  --btn-primary-bg: #e2e8f0;
+  --btn-primary-text: #0b0e14;
+  --card-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.78);
+}
+
+@layer base {
+  html {
+    overflow-x: clip;
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+    background-color: var(--bg-canvas);
+    color: var(--text-main);
+  }
+
+  body {
+    overflow-x: clip;
+    background-color: var(--bg-canvas);
+    color: var(--text-main);
+    transition: background-color 220ms ease, color 220ms ease;
+  }
+}
+
+.font-mono-tech {
+  font-family: var(--font-mono);
+}
+
+.font-editorial {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+[data-theme="light"] .splash-canvas {
+  background:
+    radial-gradient(circle at 50% 42%, var(--splash-aura-2) 0%, transparent 52%),
+    radial-gradient(circle at 80% 18%, var(--splash-aura-1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 45%, #ffffff 0%, #f6f3eb 65%, #eae5d7 100%);
+}
+
+[data-theme="dark"] .splash-canvas {
+  background:
+    radial-gradient(circle at 50% 42%, var(--splash-aura-1) 0%, transparent 56%),
+    radial-gradient(circle at 20% 80%, var(--splash-aura-2) 0%, transparent 48%),
+    radial-gradient(circle at 50% 45%, #161b26 0%, #0b0e15 74%);
+}
+
+/* =========================================================
+   BUILDBID-INSPIRED YU-GI-OH! LOGO INTRO SPLASH
+   ========================================================= */
+
+@keyframes ygoSplashLogoEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.84);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ygoSplashSheen {
+  0% {
+    transform: translateX(-140%) skewX(-22deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateX(220%) skewX(-22deg);
+    opacity: 0;
+  }
+}
+
+.ygo-splash-intro {
+  transition: opacity 380ms cubic-bezier(0.22, 1, 0.36, 1), transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ygo-splash-intro[data-leaving='true'] {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+.ygo-logo-enter {
+  animation: ygoSplashLogoEnter 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ygo-logo-sheen {
+  animation: ygoSplashSheen 1050ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
+}
+
+@keyframes pullDownHint {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+.pull-arrow-bounce {
+  animation: pullDownHint 1.5s ease-in-out infinite;
+}
+
+/* 3D Perspective Stage */
+.holo-stage {
+  perspective: 1200px;
+}
+
+/* poke-holo.simey.me inspired 3D Tilt + Prismatic Foil CSS (sharp real card corners) */
+.holo-card {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --bg-x: 50%;
+  --bg-y: 50%;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --holo-opacity: 0;
+  --card-scale: 1;
+  container-type: inline-size;
+  border-radius: 2px;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rotate-x)) rotateY(var(--rotate-y)) scale(var(--card-scale));
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 240ms ease;
+  will-change: transform;
+}
+
+.holo-card[data-interacting='true'] {
+  --card-scale: 1.025;
+  transition: transform 60ms linear, box-shadow 180ms ease;
+}
+
+.holo-flipper {
+  transform-style: preserve-3d;
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.holo-flipper[data-flipped='true'] {
+  transform: rotateY(180deg);
+}
+
+.holo-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.holo-face-back {
+  transform: rotateY(180deg);
+}
+
+.holo-shine {
+  pointer-events: none;
+  opacity: var(--holo-opacity);
+  transition: opacity 240ms ease;
+  background-image:
+    repeating-linear-gradient(
+      115deg,
+      rgba(255, 80, 110, 0.2) 0%,
+      rgba(255, 210, 90, 0.22) 7%,
+      rgba(95, 240, 175, 0.2) 14%,
+      rgba(85, 195, 255, 0.22) 21%,
+      rgba(195, 130, 255, 0.2) 28%,
+      rgba(255, 80, 110, 0.2) 35%
+    ),
+    repeating-linear-gradient(
+      25deg,
+      rgba(255, 255, 255, 0.08) 0px,
+      rgba(255, 255, 255, 0.08) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+  background-size: 240% 240%, 100% 100%;
+  background-position: var(--bg-x) var(--bg-y), 50% 50%;
+  mix-blend-mode: color-dodge;
+  filter: brightness(0.95) contrast(1.22);
+}
+
+.holo-glare {
+  pointer-events: none;
+  opacity: calc(var(--holo-opacity) * 0.82);
+  transition: opacity 240ms ease;
+  background: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    rgba(255, 255, 255, 0.44) 0%,
+    rgba(255, 244, 214, 0.16) 28%,
+    rgba(0, 0, 0, 0.16) 82%
+  );
+  mix-blend-mode: overlay;
+}
+
+/* =========================================================
+   REVERSE-ENGINEERED SERIES-10 YU-GI-OH! CARD FRAMES (cqi responsive, crisp 2px corners)
+   ========================================================= */
+
+.ygo-real-shell {
+  container-type: inline-size;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  padding: 3.1cqi;
+  background: linear-gradient(155deg, #3c3f48 0%, #24272f 50%, #17191f 100%);
+  font-family: var(--font-ygo-body);
+}
+
+.ygo-real-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 1px;
+  padding: 3cqi 3.1cqi 2.2cqi;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.42);
+}
+
+.ygo-pigment-trap {
+  background:
+    radial-gradient(circle at 25% 20%, rgba(255, 196, 226, 0.16), transparent 55%),
+    radial-gradient(circle at 80% 75%, rgba(65, 12, 42, 0.35), transparent 55%),
+    linear-gradient(155deg, #ab3b73 0%, #922a5e 45%, #7b1e4d 100%);
+}
+
+.ygo-pigment-spell {
+  background:
+    radial-gradient(circle at 25% 20%, rgba(190, 255, 238, 0.18), transparent 55%),
+    radial-gradient(circle at 80% 75%, rgba(8, 52, 46, 0.38), transparent 55%),
+    linear-gradient(155deg, #21937f 0%, #157766 46%, #0e594c 100%);
+}
+
+.ygo-pigment-monster {
+  background:
+    radial-gradient(circle at 24% 20%, rgba(255, 234, 198, 0.22), transparent 55%),
+    radial-gradient(circle at 82% 76%, rgba(88, 42, 12, 0.34), transparent 55%),
+    linear-gradient(155deg, #cd8447 0%, #b56831 48%, #965022 100%);
+}
+
+.ygo-title-plate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2cqi;
+  padding: 1.3cqi 2.1cqi;
+  border-radius: 0.7cqi;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.14) 55%, rgba(0, 0, 0, 0.16) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+    0 1.5px 3px rgba(0, 0, 0, 0.32);
+}
+
+.ygo-card-title {
+  font-family: var(--font-ygo-title);
+  font-size: 5.3cqi;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #14110f;
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.42);
+}
+
+.ygo-title-light {
+  color: #f8f5ee;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.72);
+}
+
+.ygo-attr-orb {
+  width: 7.4cqi;
+  height: 7.4cqi;
+  border-radius: 9999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 0.45cqi solid rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+.ygo-attr-TRAP {
+  background: radial-gradient(circle at 32% 28%, #eb75b3, #8f1d59 70%, #520a31);
+  color: #fff3fa;
+}
+
+.ygo-attr-SPELL {
+  background: radial-gradient(circle at 32% 28%, #58d6b9, #0e6f5e 70%, #063d33);
+  color: #ecfffb;
+}
+
+.ygo-attr-LIGHT {
+  background: radial-gradient(circle at 32% 28%, #fff6be, #c79c28 70%, #7d5b0c);
+  color: #261b04;
+}
+
+.ygo-attr-EARTH {
+  background: radial-gradient(circle at 32% 28%, #deb887, #8b5c2d 70%, #4d2f12);
+  color: #fff7eb;
+}
+
+.ygo-subrow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.9cqi;
+  height: 5.8cqi;
+  padding: 0 1.4cqi;
+  margin-top: 0.8cqi;
+}
+
+.ygo-star {
+  width: 4.5cqi;
+  height: 4.5cqi;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 30%, #ffd066, #d9521a 65%, #8a1d06);
+  border: 0.35cqi solid #ffe69a;
+  box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.55);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff6c9;
+  font-size: 3.1cqi;
+  line-height: 1;
+}
+
+.ygo-st-badge {
+  font-family: var(--font-ygo-title);
+  font-size: 3.7cqi;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #f7f4ec;
+  text-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.72);
+}
+
+.ygo-art-frame {
+  position: relative;
+  width: 92%;
+  margin: 0.6cqi auto 0;
+  aspect-ratio: 1 / 1;
+  background: #0d0f14;
+  border: 1.1cqi solid #5b5447;
+  box-shadow:
+    inset 0 0 0 1.5px #1e1b17,
+    0 0 0 1px #24211c,
+    0 2.5px 6px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.ygo-set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8cqi 3.8%;
+  font-family: var(--font-sans);
+  font-size: 2.7cqi;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65);
+}
+
+.ygo-lore-box {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #f3ebda 0%, #eae0ca 100%);
+  border: 0.85cqi solid #9e6b35;
+  box-shadow: inset 0 0 0 1px rgba(84, 52, 22, 0.35), 0 1.5px 3px rgba(0, 0, 0, 0.35);
+  padding: 1.6cqi 2.2cqi 1.2cqi;
+  color: #161310;
+}
+
+.ygo-lore-type {
+  font-family: var(--font-ygo-title);
+  font-size: 3.3cqi;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #14110f;
+}
+
+.ygo-lore-text {
+  font-family: var(--font-ygo-body);
+  font-size: 3.55cqi;
+  line-height: 1.18;
+  font-weight: 600;
+  color: #1c1814;
+  margin-top: 0.6cqi;
+}
+
+.ygo-atkdef-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2.5cqi;
+  border-top: 0.45cqi solid #4e3b28;
+  padding-top: 0.7cqi;
+  margin-top: 0.6cqi;
+  font-family: var(--font-ygo-title);
+  font-size: 3.4cqi;
+  font-weight: 800;
+  color: #14110f;
+}
+
+.ygo-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8cqi 1cqi 0;
+  font-size: 2.5cqi;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.86);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7);
+}
+
+.ygo-eye-seal {
+  width: 3.3cqi;
+  height: 3.3cqi;
+  border-radius: 0.2cqi;
+  background: linear-gradient(135deg, #fff3b8 0%, #d4af37 52%, #7c5e12 100%);
+  box-shadow: 0 0 4px rgba(243, 218, 139, 0.75);
+}
+
+/* =========================================================
+   SILVER LIGHT SUMMON BURST & YU-GI-OH! DUEL ANIMATIONS
+   ========================================================= */
+
+@keyframes summonRayPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.42) rotate(0deg);
+  }
+  25% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7) rotate(24deg);
+  }
+}
+
+@keyframes summonRingExpand {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.85);
+  }
+}
+
+@keyframes summonSparkOut {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--spark-angle)) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--spark-angle)) translateY(var(--spark-dist)) scale(0.15);
+  }
+}
+
+.summon-rays {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 14deg,
+    rgba(226, 232, 240, 0.48) 18deg,
+    transparent 24deg 48deg,
+    rgba(147, 197, 253, 0.28) 52deg,
+    transparent 58deg 88deg,
+    rgba(241, 245, 249, 0.44) 92deg,
+    transparent 98deg 132deg,
+    rgba(148, 163, 184, 0.36) 136deg,
+    transparent 142deg 178deg,
+    rgba(147, 197, 253, 0.28) 182deg,
+    transparent 188deg 224deg,
+    rgba(226, 232, 240, 0.46) 228deg,
+    transparent 234deg 268deg,
+    rgba(148, 163, 184, 0.36) 272deg,
+    transparent 278deg 315deg,
+    rgba(241, 245, 249, 0.4) 320deg,
+    transparent 326deg 360deg
+  );
+  mask-image: radial-gradient(circle, transparent 16%, black 38%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle, transparent 16%, black 38%, transparent 72%);
+  animation: summonRayPulse 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.summon-ring {
+  border: 2px solid rgba(226, 232, 240, 0.78);
+  box-shadow: 0 0 28px rgba(148, 163, 184, 0.45);
+  animation: summonRingExpand 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.summon-spark {
+  animation: summonSparkOut 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes summonFlashPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  28% {
+    opacity: 0.92;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+.summon-flash {
+  background: radial-gradient(
+    circle,
+    rgba(248, 250, 252, 0.82) 0%,
+    rgba(203, 213, 225, 0.36) 36%,
+    transparent 70%
+  );
+  animation: summonFlashPulse 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes ygoCardDealIn {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92) rotate(-1.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+.ygo-card-deal-in {
+  animation: ygoCardDealIn 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ygoCardSheenSweep {
+  0% {
+    transform: translateX(-140%) skewX(-20deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateX(240%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.ygo-card-sheen {
+  animation: ygoCardSheenSweep 1.15s cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+
+@keyframes ygoPhaseBannerSlash {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scaleX(0.92);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+  78% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scaleX(0.97);
+  }
+}
+
+.ygo-phase-banner {
+  animation: ygoPhaseBannerSlash 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ygoBackdropIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.ygo-backdrop-in {
+  animation: ygoBackdropIn 200ms ease-out both;
+}
+
+@keyframes ygoModalSummon {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ygo-modal-summon {
+  animation: ygoModalSummon 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ygoMediaFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ygo-media-fade {
+  animation: ygoMediaFade 200ms ease-out both;
+}
+
+/* =========================================================
+   DUEL FIELD PLAYMAT & MASTER DUEL DIALOGUE INSPECTOR
+   ========================================================= */
+
+.duel-field-grid {
+  background-image:
+    radial-gradient(circle at 1px 1px, var(--border-subtle) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+.duel-field-perspective {
+  transform: perspective(1150px) rotateX(18deg) scale(1.04);
+  transform-origin: center 55%;
+}
+
+.duel-dialogue-box {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holo-card,
+  .holo-flipper,
+  .pull-arrow-bounce,
+  .ygo-logo-enter,
+  .ygo-logo-sheen,
+  .ygo-splash-intro,
+  .summon-flash,
+  .summon-rays,
+  .summon-ring,
+  .summon-spark,
+  .ygo-card-deal-in,
+  .ygo-card-sheen,
+  .ygo-phase-banner,
+  .ygo-backdrop-in,
+  .ygo-modal-summon,
+  .ygo-media-fade {
+    animation: none !important;
+    transition: none !important;
+  }
+}
