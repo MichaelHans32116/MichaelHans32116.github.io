@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ArrowDown, RotateCcw } from 'lucide-react'
+import hansIdAvatar from '../images/web/michael-hans-id.jpg'
 import { BgmMode, BgmTrackId, duelSfx } from '../utils/sfx'
 import { AudioControls } from './AudioControls'
 import { DuelFieldBg } from './DuelFieldBg'
@@ -726,9 +727,9 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
           aria-label="Life Points 8000"
           className="pointer-events-none fixed bottom-3.5 left-3.5 z-30 flex items-center sm:bottom-6 sm:left-7"
         >
-          <div className="relative z-10 h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-sky-300 bg-[#0b152a] shadow-[0_6px_18px_rgba(2,132,199,0.45)] sm:h-12 sm:w-12">
+          <div className="relative z-10 h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-sky-300 bg-white shadow-[0_6px_18px_rgba(2,132,199,0.45)] sm:h-12 sm:w-12">
             <img
-              src="/assets/michael-hans-avatar.jpg"
+              src={hansIdAvatar}
               alt="Michael Hans"
               className="h-full w-full object-cover object-top"
               draggable={false}

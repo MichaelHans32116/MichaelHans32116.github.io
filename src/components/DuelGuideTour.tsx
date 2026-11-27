@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import hansIdAvatar from '../images/web/michael-hans-id.jpg'
 import { duelSfx } from '../utils/sfx'
 
 export interface GuideTourStep {
@@ -288,9 +289,9 @@ export const DuelGuideTour: React.FC<DuelGuideTourProps> = ({ open, steps, onClo
             <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
               <div className="flex items-center gap-2">
                 <img
-                  src="/assets/michael-hans-avatar.jpg"
+                  src={hansIdAvatar}
                   alt="Hans"
-                  className="h-6 w-6 rounded-full border border-slate-800 object-cover object-top"
+                  className="h-6 w-6 rounded-full border border-slate-800 bg-white object-cover object-top"
                 />
                 <span className="font-mono-tech text-[11px] font-bold tracking-wider text-slate-900 uppercase">
                   {current.speaker || 'Hans'}
