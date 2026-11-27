@@ -618,7 +618,10 @@ export function PhaseCardTray({
                   : 'border-white/15 bg-white/10 text-[#e2e8f0]'
               }`}
             >
-              {activeMeta.code} · {activeMeta.label}
+              <span className="inline-flex items-center gap-1.5">
+                <span className="opacity-70">{activeMeta.code}</span>
+                <span>{activeMeta.label}</span>
+              </span>
             </span>
             <ChevronUp
               className={`h-3.5 w-3.5 transition-transform duration-300 sm:h-4 sm:w-4 ${
@@ -693,9 +696,12 @@ export function PhaseCardTray({
                     >
                       Phase Tray
                     </span>
-                    <span className={isLight ? 'text-[#94a3b8]' : 'text-white/30'}>·</span>
-                    <span className={`truncate ${isLight ? 'text-[#4e5460]' : 'text-slate-300'}`}>
-                      {highlightedCard.code} · {highlightedCard.label}
+                    <span
+                      className={`truncate border-l pl-2 ${
+                        isLight ? 'border-[#cbd5e1] text-[#4e5460]' : 'border-white/20 text-slate-300'
+                      }`}
+                    >
+                      {highlightedCard.code} {highlightedCard.label}
                     </span>
                   </div>
                   <span
@@ -818,7 +824,7 @@ export function PhaseCardTray({
                     }`}
                   >
                     <Check className="h-3.5 w-3.5" />
-                    <span>Select · {highlightedCard.label}</span>
+                    <span>Select {highlightedCard.label}</span>
                   </button>
                 </div>
               </div>

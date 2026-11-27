@@ -629,8 +629,9 @@ export function App() {
           aria-live="polite"
           className="ygo-phase-banner pointer-events-none fixed left-1/2 top-16 z-40 -translate-x-1/2 rounded-[2px] border border-[var(--accent-silver)]/60 bg-[var(--bg-surface)]/92 px-5 py-1.5 shadow-md backdrop-blur-md"
         >
-          <span className="font-mono-tech text-[11px] font-semibold tracking-[0.22em] text-[var(--text-main)] uppercase">
-            <span className="text-[var(--accent-silver)]">{phaseBanner.code}</span> · {phaseBanner.banner}
+          <span className="inline-flex items-center gap-2 font-mono-tech text-[11px] font-semibold tracking-[0.22em] text-[var(--text-main)] uppercase">
+            <span className="text-[var(--accent-silver)]">{phaseBanner.code}</span>
+            <span>{phaseBanner.banner}</span>
           </span>
         </div>
       )}
@@ -744,7 +745,7 @@ export function App() {
       >
         <div ref={phaseContainerRef}>
           {/* =========================================================
-              SP · HOME (Direct Conversational Intro + Standouts + Education + Interactive Toolkit)
+              SP - HOME (Direct Conversational Intro, Standouts, Education & Toolkit)
               ========================================================= */}
           {activePhase === 'standby' && (
             <div className="space-y-10 sm:space-y-14 lg:space-y-16">
@@ -924,7 +925,10 @@ export function App() {
                       {EDUCATION_INFO.degree}
                     </p>
                     <p className="text-xs text-[var(--text-muted)]">
-                      {EDUCATION_INFO.location} · {PROFILE.ojtWindow}
+                      {EDUCATION_INFO.location}
+                    </p>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      {PROFILE.ojtWindow}
                     </p>
                   </div>
 
@@ -961,7 +965,7 @@ export function App() {
           )}
 
           {/* =========================================================
-              MP1 · DECK (Segregated Main Deck Cards & Side Deck)
+              MP1 - DECK (Segregated Main Deck Cards & Side Deck)
               ========================================================= */}
           {activePhase === 'main' && (
             <div className="space-y-10 sm:space-y-14">
@@ -969,7 +973,7 @@ export function App() {
                 <div className="space-y-1">
                   <h1 className="font-editorial text-3xl text-[var(--text-main)] sm:text-4xl">The Deck</h1>
                   <p className="font-mono-tech text-[11px] text-[var(--text-muted)]">
-                    MAIN DECK ({DECK_CARDS.length}) · SIDE DECK ({SIDE_WORK_ARCHIVE.length})
+                    {DECK_CARDS.length} Main Deck Cards, {SIDE_WORK_ARCHIVE.length} Side Deck
                   </p>
                 </div>
 
@@ -999,7 +1003,7 @@ export function App() {
                       title: 'Projects Deck',
                       deckTypeLabel: 'TRAP DECK',
                       boxCode: 'TRAP',
-                      countSummary: `Main ${trapCards.length} · Trap Cards`,
+                      countSummary: `${trapCards.length} Trap Cards`,
                       tagline: 'Production apps & systems',
                       coverSrc: DECK_BOX_COVERS.projects,
                       accent: '#a22c6a',
@@ -1009,7 +1013,7 @@ export function App() {
                       title: 'Achievements Deck',
                       deckTypeLabel: 'SPELL DECK',
                       boxCode: 'SPELL',
-                      countSummary: `Main ${spellCards.length} · Spell Cards`,
+                      countSummary: `${spellCards.length} Spell Cards`,
                       tagline: 'Certifications, CTF & scholarships',
                       coverSrc: DECK_BOX_COVERS.achievements,
                       accent: '#157766',
@@ -1019,7 +1023,7 @@ export function App() {
                       title: 'References Deck',
                       deckTypeLabel: 'MONSTER DECK',
                       boxCode: 'MNSTR',
-                      countSummary: `Main ${monsterCards.length} · Monster Cards`,
+                      countSummary: `${monsterCards.length} Monster Cards`,
                       tagline: 'Supervisors, coaches & panelists',
                       coverSrc: DECK_BOX_COVERS.references,
                       accent: '#b56831',
@@ -1029,7 +1033,7 @@ export function App() {
                       title: 'Side Deck',
                       deckTypeLabel: 'SIDE DECK',
                       boxCode: 'SIDE',
-                      countSummary: `Side ${SIDE_WORK_ARCHIVE.length} · Utilities & Collabs`,
+                      countSummary: `${SIDE_WORK_ARCHIVE.length} Side Cards`,
                       tagline: 'Coursework tools & web games',
                       coverSrc: DECK_BOX_COVERS.side,
                       accent: '#475569',
@@ -1061,20 +1065,20 @@ export function App() {
 
               <div id="tour-deck-cards" className="space-y-10 sm:space-y-14">
                 {(deckFilter === 'all' || deckFilter === 'projects') &&
-                  renderDeckShelf('Main Deck · Trap Cards (Projects)', trapCards)}
+                  renderDeckShelf('Trap Cards (Projects)', trapCards)}
 
                 {(deckFilter === 'all' || deckFilter === 'achievements') &&
-                  renderDeckShelf('Main Deck · Spell Cards (Achievements & Scholarships)', spellCards)}
+                  renderDeckShelf('Spell Cards (Achievements & Scholarships)', spellCards)}
 
                 {(deckFilter === 'all' || deckFilter === 'references') &&
-                  renderDeckShelf('Main Deck · Monster Cards (Character References)', monsterCards)}
+                  renderDeckShelf('Monster Cards (Character References)', monsterCards)}
 
                 {(deckFilter === 'all' || deckFilter === 'side') && (
                   <section className="space-y-5 border-t border-dashed border-[var(--border-hover)] pt-8 sm:space-y-6 sm:pt-10">
                   <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-[var(--border-subtle)] pb-2.5">
                     <div>
                       <p className="font-mono-tech text-[10px] font-semibold tracking-[0.16em] text-[var(--accent-silver)] uppercase">
-                        SIDE DECK ZONE · UTILITIES &amp; COLLABS
+                        SIDE DECK ZONE
                       </p>
                       <h2 className="mt-1 font-editorial text-xl leading-snug text-[var(--text-main)] sm:text-2xl">
                         Side Deck: Tools, Coursework &amp; Collaborations
@@ -1172,19 +1176,19 @@ export function App() {
           )}
 
           {/* =========================================================
-              BP · EXPERIENCE (Internship Delivery + Real Field Photos)
+              BP - EXPERIENCE (Internship Delivery & Real Field Photos)
               ========================================================= */}
           {activePhase === 'battle' && (
             <div className="space-y-10 sm:space-y-14">
               <div className="space-y-2 border-b border-[var(--border-subtle)] pb-5 sm:pb-6">
                 <p className="font-mono-tech text-[11px] font-semibold tracking-[0.16em] text-[var(--accent-silver)] uppercase">
-                  BATTLE PHASE · EXPERIENCE
+                  BATTLE PHASE
                 </p>
                 <h1 className="font-editorial text-3xl text-[var(--text-main)] sm:text-4xl">
                   Experience &amp; Field Record
                 </h1>
                 <p className="text-sm text-[var(--text-secondary)]">
-                  Enterprise internship delivery at Moriroku Philippines, 458-commit startup engineering at BuildBid, and field deployments.
+                  Enterprise internship delivery at Moriroku Philippines, startup engineering at BuildBid, and field deployments.
                 </p>
               </div>
 
@@ -1204,7 +1208,10 @@ export function App() {
                     </div>
                     <h2 className="mt-2.5 text-base font-semibold text-[var(--text-main)] sm:mt-3 sm:text-lg">{exp.role}</h2>
                     <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
-                      {exp.company} · {exp.location}
+                      {exp.company}
+                    </p>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      {exp.location}
                     </p>
                     <ul className="mt-4 space-y-2 text-[13px] leading-relaxed text-[var(--text-secondary)] sm:text-sm">
                       {exp.points.map((pt) => (
@@ -1294,7 +1301,7 @@ export function App() {
           )}
 
           {/* =========================================================
-              MP2 · ABOUT ME (Playful Personal Voice & Photo Chapters)
+              MP2 - ABOUT ME (Playful Personal Voice & Photo Chapters)
               ========================================================= */}
           {activePhase === 'main2' && (
             <AboutMePhase
@@ -1304,7 +1311,7 @@ export function App() {
           )}
 
           {/* =========================================================
-              EP · CONTACT & GITHUB TRAIL (Cham-inspired calm 2-column layout)
+              EP - CONTACT & GITHUB TRAIL (Cham-inspired calm 2-column layout)
               ========================================================= */}
           {activePhase === 'end' && (
             <div className="space-y-9 sm:space-y-12">
@@ -1313,7 +1320,7 @@ export function App() {
                 <div className="space-y-5 sm:space-y-6">
                   <div className="space-y-2.5 sm:space-y-3">
                     <p className="font-mono-tech text-[11px] font-semibold tracking-[0.16em] text-[var(--accent-silver)] uppercase">
-                      END PHASE · OPEN FOR 600-HOUR OJT
+                      END PHASE
                     </p>
                     <h1 className="font-editorial text-[2rem] leading-tight text-[var(--text-main)] sm:text-[42px]">
                       Your turn. Let&rsquo;s build.
@@ -1321,9 +1328,10 @@ export function App() {
                     <p className="max-w-md text-sm leading-relaxed text-[var(--text-secondary)]">
                       Looking for a 600-hour OJT intern or help on a web or backend system? Send a message here and I&rsquo;ll get back to you.
                     </p>
-                    <p className="font-mono-tech text-xs text-[var(--text-muted)]">
-                      {PROFILE.ojtWindow} · {PROFILE.location}
-                    </p>
+                    <div className="space-y-0.5 font-mono-tech text-xs text-[var(--text-muted)]">
+                      <p>{PROFILE.ojtWindow}</p>
+                      <p>{PROFILE.location}</p>
+                    </div>
                   </div>
 
                   <div className="space-y-3 border-t border-[var(--border-subtle)] pt-5 text-sm">

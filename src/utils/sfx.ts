@@ -23,31 +23,31 @@ export const BGM_TRACKS: BgmTrackMeta[] = [
   {
     id: 'unstable-thought',
     label: 'An Unstable Thought',
-    subtitle: 'ARC-V · Home / Strategy',
+    subtitle: 'ARC-V (Home / Strategy)',
     src: '/sfx/arcv-unstable-thought.mp3',
   },
   {
     id: 'passionate-duelist',
     label: 'Passionate Duelist',
-    subtitle: 'DM Classic · The Deck',
+    subtitle: 'DM Classic (The Deck)',
     src: '/sfx/passionate-duelist.mp3',
   },
   {
     id: 'zone-5ds',
     label: 'Z-ONE Remix',
-    subtitle: "5D's · Battle / Experience",
+    subtitle: "5D's (Battle / Experience)",
     src: '/sfx/zone-5ds-remix.mp3',
   },
   {
     id: 'resistance',
     label: 'Resistance',
-    subtitle: 'ARC-V · Contact / Closer',
+    subtitle: 'ARC-V (Contact / Closer)',
     src: '/sfx/arcv-resistance.mp3',
   },
   {
     id: 'gods-anger',
     label: "God's Anger",
-    subtitle: 'Egyptian God · Bonus Theme',
+    subtitle: 'Egyptian God (Bonus Theme)',
     src: '/sfx/gods-anger.mp3',
   },
 ]

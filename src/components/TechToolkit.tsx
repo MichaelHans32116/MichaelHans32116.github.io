@@ -229,7 +229,7 @@ const SKILL_PROOFS: Record<string, SkillProofEntry> = {
     cardIds: ['gatepass', 'hrad', 'howconnect'],
   },
   TypeScript: {
-    summary: 'Used across all 458 commits on BuildBid for typed forms, quote tables, and server actions.',
+    summary: 'Typed forms, quote comparison tables, and server actions across BuildBid.',
     cardIds: ['buildbid'],
   },
   Java: {
@@ -265,7 +265,7 @@ const SKILL_PROOFS: Record<string, SkillProofEntry> = {
     cardIds: ['gatepass', 'hrad', 'howconnect'],
   },
   'Next.js': {
-    summary: 'Built the full BuildBid marketplace frontend and route handlers across 72+ sprint phases.',
+    summary: 'Built the BuildBid marketplace frontend, routing, and API handlers.',
     cardIds: ['buildbid'],
   },
   React: {
@@ -321,7 +321,7 @@ const SKILL_PROOFS: Record<string, SkillProofEntry> = {
     cardIds: ['buildbid', 'howconnect', 'collabs'],
   },
   GitHub: {
-    summary: 'Managed 458 commits, pull requests, and GitHub Actions test workflows.',
+    summary: 'Managed branches, pull requests, and GitHub Actions test workflows.',
     cardIds: ['buildbid', 'howconnect'],
   },
   'Raspberry Pi': {
@@ -448,7 +448,7 @@ export const TechToolkit: React.FC<TechToolkitProps> = ({ onOpenCard }) => {
                     {card.title}
                   </p>
                   <p className="truncate font-mono-tech text-[11px] text-[var(--text-muted)]">
-                    {card.typeTag} · {card.subtitle}
+                    {card.subtitle}
                   </p>
                 </div>
                 <ArrowUpRight className="h-4 w-4 shrink-0 text-[var(--text-muted)] transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--text-main)]" />

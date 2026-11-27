@@ -261,16 +261,21 @@ export const DeckCardModal: React.FC<DeckCardModalProps> = ({
         {/* RIGHT COLUMN: Calm, Un-Cluttered Editorial View */}
         <div className="min-h-0 flex-1 p-4 sm:p-7 lg:p-10 md:overflow-y-auto md:overscroll-contain">
           <div className="flex items-start justify-between gap-4 border-b border-[var(--border-subtle)] pb-4 sm:pb-5">
-            <div className="min-w-0 space-y-1">
+            <div className="min-w-0 flex-1 space-y-1.5">
               <h2
                 id="deck-modal-title"
                 className="font-editorial text-xl leading-snug text-[var(--text-main)] sm:text-3xl"
               >
                 {item.title}
               </h2>
-              <p className="text-xs text-[var(--text-secondary)] sm:text-sm">
-                {item.roleOrIssuer} · <span className="text-[var(--text-muted)]">{item.period}</span>
-              </p>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <p className="text-xs font-medium text-[var(--text-secondary)] sm:text-sm">
+                  {item.roleOrIssuer}
+                </p>
+                <span className="font-mono-tech text-[11px] text-[var(--text-muted)] sm:text-xs">
+                  {item.period}
+                </span>
+              </div>
             </div>
 
             <button
@@ -375,12 +380,6 @@ export const DeckCardModal: React.FC<DeckCardModalProps> = ({
                   </li>
                 ))}
               </ul>
-            )}
-
-            {item.stack && item.stack.length > 0 && (
-              <p className="font-mono-tech text-xs leading-relaxed text-[var(--text-muted)]">
-                {item.stack.join(' · ')}
-              </p>
             )}
 
             <div className="flex flex-wrap items-center gap-2.5 border-t border-[var(--border-subtle)] pt-4 sm:pt-5">

@@ -53,7 +53,7 @@ const LIFE_DECKS: LifeDeckItem[] = [
     title: 'Church & Outreach',
     deckTypeLabel: 'FAITH DECK',
     boxCode: 'FAITH',
-    countSummary: 'Photos 4 · Faith & Piano',
+    countSummary: '4 Photos',
     tagline: 'House of Worship LB, Sat Masili & Sun Sucol',
     story:
       'I play piano at House of Worship Los Baños and help lead barangay outreach. Funny enough, they are also the real client behind my HoW Connect app. Every Saturday I am in Barangay Masili and every Sunday in Barangay Sucol for kids ministry and house-to-house visits.',
@@ -92,7 +92,7 @@ const LIFE_DECKS: LifeDeckItem[] = [
     title: 'Friends & Food Trips',
     deckTypeLabel: 'SQUAD DECK',
     boxCode: 'SQUAD',
-    countSummary: 'Photos 3 · Squad & Food',
+    countSummary: '3 Photos',
     tagline: 'Dinner runs, pizza nights & late cafes',
     story:
       'Most of my favorite memories happen around crowded dinner tables after surviving exams or defenses, sharing pizza boxes, and hanging out at cafes until late.',
@@ -125,7 +125,7 @@ const LIFE_DECKS: LifeDeckItem[] = [
     title: 'Yuki & Birthday Art',
     deckTypeLabel: 'COMPANION DECK',
     boxCode: 'YUKI',
-    countSummary: 'Photos 3 · Dog & Art',
+    countSummary: '3 Photos',
     tagline: 'Favorite dog Yuki & 21st birthday drawing',
     story:
       'Yuki is my favorite dog and basically runs our house in her blue gingham dress. Right beside her is my favorite art piece: a 21st birthday drawing I commissioned from one of my favorite people, starring Yuki on top of the cake.',
@@ -158,7 +158,7 @@ const LIFE_DECKS: LifeDeckItem[] = [
     title: 'Gear & Hobbies',
     deckTypeLabel: 'HOBBY DECK',
     boxCode: 'GEAR',
-    countSummary: 'Photos 4 · Audio & Games',
+    countSummary: '4 Photos',
     tagline: 'Bose QC Ultra, Mjolnir 16cm, Chess & Genshin',
     story:
       'Outside dev work I rotate between my Bose QuietComfort Ultra and Sony WH-1000XM5 headphones, my Mjolnir 16cm wide-frame pickleball paddle, weekend chess, and Genshin co-op with friends.',
@@ -286,12 +286,6 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
     setActiveDeckIdx(idx)
   }
 
-  const stepDeck = (delta: -1 | 1) => {
-    if (activeDeckIdx === null) return
-    duelSfx.playHover()
-    setActiveDeckIdx((activeDeckIdx + delta + LIFE_DECKS.length) % LIFE_DECKS.length)
-  }
-
   const stepPhoto = (delta: -1 | 1) => {
     if (!activeDeck) return
     duelSfx.playHover()
@@ -317,26 +311,26 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
               onClick={(e) => e.stopPropagation()}
               className="ygo-modal-summon relative flex max-h-[84dvh] w-[min(1040px,94vw)] flex-col overflow-y-auto overscroll-contain rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-2xl focus:outline-none md:grid md:h-[min(74dvh,590px)] md:grid-cols-[1.32fr_1fr] md:grid-rows-[minmax(0,1fr)] md:overflow-hidden"
             >
-              {/* Sticky Mobile Header: keeps Prev/Next Deck and Close X reachable above the bottom dock */}
+              {/* Sticky Mobile Header: keeps within-deck photo navigation and Close X reachable */}
               <div className="sticky top-0 z-20 flex shrink-0 items-center justify-between gap-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 px-3.5 py-2.5 backdrop-blur-md md:hidden">
                 <div className="flex items-center gap-2 text-xs">
                   <button
                     type="button"
-                    onClick={() => stepDeck(-1)}
+                    onClick={() => stepPhoto(-1)}
                     className="inline-flex h-8 items-center gap-0.5 rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2 font-medium text-[var(--text-main)] transition hover:border-[var(--border-hover)]"
-                    aria-label="Previous life deck"
+                    aria-label="Previous photo"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                     <span>Prev</span>
                   </button>
                   <span className="font-mono-tech text-[11px] text-[var(--text-muted)]">
-                    {(activeDeckIdx ?? 0) + 1} / {LIFE_DECKS.length}
+                    Page {activePhotoIdx + 1} / {activeDeck.photos.length}
                   </span>
                   <button
                     type="button"
-                    onClick={() => stepDeck(1)}
+                    onClick={() => stepPhoto(1)}
                     className="inline-flex h-8 items-center gap-0.5 rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2 font-medium text-[var(--text-main)] transition hover:border-[var(--border-hover)]"
-                    aria-label="Next life deck"
+                    aria-label="Next photo"
                   >
                     <span>Next</span>
                     <ChevronRight className="h-3.5 w-3.5" />
@@ -427,13 +421,10 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
                 )}
               </div>
 
-              {/* RIGHT COLUMN: Story Info + Active Photo Caption + Desktop Deck Switcher */}
+              {/* RIGHT COLUMN: Story Info + Active Photo Caption + Within-Deck Page Indicator */}
               <div className="flex min-h-0 flex-col justify-between">
                 <div className="hidden shrink-0 items-start justify-between gap-4 border-b border-[var(--border-subtle)] px-6 py-4 md:flex">
-                  <div className="min-w-0 space-y-1">
-                    <p className="font-mono-tech text-[10px] font-semibold tracking-[0.16em] text-[var(--accent-silver)] uppercase">
-                      {activeDeck.deckTypeLabel} · {activeDeck.countSummary}
-                    </p>
+                  <div className="min-w-0">
                     <h2
                       id="life-deck-modal-title"
                       className="font-editorial text-2xl leading-tight text-[var(--text-main)]"
@@ -456,10 +447,7 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
                 </div>
 
                 <div className="min-h-0 flex-1 space-y-4 p-4 sm:p-6 md:overflow-y-auto md:overscroll-contain">
-                  <div className="space-y-1 md:hidden">
-                    <p className="font-mono-tech text-[10px] font-semibold tracking-[0.16em] text-[var(--accent-silver)] uppercase">
-                      {activeDeck.deckTypeLabel} · {activeDeck.countSummary}
-                    </p>
+                  <div className="md:hidden">
                     <h2 className="font-editorial text-xl leading-tight text-[var(--text-main)]">
                       {activeDeck.title}
                     </h2>
@@ -469,14 +457,11 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
                     {activeDeck.story}
                   </p>
 
-                  <div className="rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-muted)]/50 p-3.5">
-                    <p className="font-mono-tech text-[10px] font-semibold tracking-wider text-[var(--accent-silver)] uppercase">
-                      Card {activePhotoIdx + 1} of {activeDeck.photos.length}
-                    </p>
-                    <h3 className="mt-1 text-sm font-semibold text-[var(--text-main)]">
+                  <div className="space-y-1.5 border-t border-[var(--border-subtle)] pt-4">
+                    <h3 className="text-sm font-semibold text-[var(--text-main)] sm:text-[15px]">
                       {activePhoto.title}
                     </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
+                    <p className="text-xs leading-relaxed text-[var(--text-secondary)] sm:text-[13.5px]">
                       {activePhoto.caption}
                     </p>
                   </div>
@@ -485,25 +470,25 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
                 <div className="hidden shrink-0 items-center justify-between border-t border-[var(--border-subtle)] px-6 py-3.5 text-xs md:flex">
                   <button
                     type="button"
-                    onClick={() => stepDeck(-1)}
+                    onClick={() => stepPhoto(-1)}
                     className="inline-flex items-center gap-1 font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-main)]"
-                    aria-label="Previous life deck"
+                    aria-label="Previous photo"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
-                    <span>Prev Deck</span>
+                    <span>Prev</span>
                   </button>
 
                   <span className="font-mono-tech text-[11px] text-[var(--text-muted)]">
-                    {(activeDeckIdx ?? 0) + 1} / {LIFE_DECKS.length}
+                    Page {activePhotoIdx + 1} of {activeDeck.photos.length}
                   </span>
 
                   <button
                     type="button"
-                    onClick={() => stepDeck(1)}
+                    onClick={() => stepPhoto(1)}
                     className="inline-flex items-center gap-1 font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-main)]"
-                    aria-label="Next life deck"
+                    aria-label="Next photo"
                   >
-                    <span>Next Deck</span>
+                    <span>Next</span>
                     <ChevronRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -518,7 +503,7 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
     <div className="space-y-10 sm:space-y-12">
       <section className="space-y-2.5 border-b border-[var(--border-subtle)] pb-5 sm:pb-6">
         <p className="font-mono-tech text-[11px] font-semibold tracking-[0.16em] text-[var(--accent-silver)] uppercase">
-          MAIN PHASE 2 · ABOUT ME
+          MAIN PHASE 2
         </p>
         <h1 className="font-editorial text-[2rem] leading-tight text-[var(--text-main)] sm:text-[42px]">
           Outside the IDE.
