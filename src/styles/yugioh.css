@@ -111,7 +111,7 @@
 }
 
 /* =========================================================
-   BUILDBID-INSPIRED YU-GI-OH! LOGO INTRO SPLASH
+   YU-GI-OH! LOGO INTRO SPLASH
    ========================================================= */
 
 @keyframes ygoSplashLogoEnter {
@@ -818,73 +818,6 @@
   position: relative;
 }
 
-/* =========================================================
-   DUEL LINKS CHAMFERED DIALOGUE BUBBLE & GUIDED POINTER
-   ========================================================= */
-
-.ygo-duel-bubble-frame {
-  padding: 3px;
-  background: #0b0e14;
-  clip-path: polygon(
-    16px 0,
-    calc(100% - 16px) 0,
-    100% 16px,
-    100% calc(100% - 16px),
-    calc(100% - 16px) 100%,
-    16px 100%,
-    0 calc(100% - 16px),
-    0 16px
-  );
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.42));
-}
-
-.ygo-duel-bubble-inner {
-  background: #ffffff;
-  color: #0f172a;
-  clip-path: polygon(
-    14px 0,
-    calc(100% - 14px) 0,
-    100% 14px,
-    100% calc(100% - 14px),
-    calc(100% - 14px) 100%,
-    14px 100%,
-    0 calc(100% - 14px),
-    0 14px
-  );
-}
-
-@keyframes ygoTypeBlink {
-  0%, 49% {
-    opacity: 1;
-  }
-  50%, 100% {
-    opacity: 0;
-  }
-}
-
-.ygo-type-cursor {
-  display: inline-block;
-  width: 2px;
-  height: 0.95em;
-  margin-left: 2px;
-  vertical-align: -0.1em;
-  background-color: #0284c7;
-  animation: ygoTypeBlink 0.78s steps(2, end) infinite;
-}
-
-@keyframes ygoPointerBob {
-  0%, 100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(-3px, -5px);
-  }
-}
-
-.ygo-pointer-bob {
-  animation: ygoPointerBob 1.3s ease-in-out infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .holo-card,
   .holo-flipper,
@@ -907,9 +840,7 @@
   .ygo-media-fade,
   .ygo-theme-flip-stage,
   .ygo-flip-to-dark,
-  .ygo-flip-to-light,
-  .ygo-type-cursor,
-  .ygo-pointer-bob {
+  .ygo-flip-to-light {
     animation: none !important;
     transition: none !important;
   }

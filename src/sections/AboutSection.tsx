@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { X } from 'lucide-react'
+import { DuelDeckBoxCard } from '../components/DuelDeckBoxCard'
+import { CarouselSlide, MediaCarousel } from '../components/MediaCarousel'
 import { duelSfx } from '../utils/sfx'
-import { DuelDeckBoxCard } from './DuelDeckBoxCard'
 import boseQcUltraImg from '../images/web/bose-qc-ultra.jpg'
 import chessMatchImg from '../images/web/chess-match.jpg'
 import evangelismDrawingImg from '../images/web/evangelism-drawing.jpg'
@@ -17,11 +18,6 @@ import howconnectGroupImg from '../images/web/howconnect-group.jpg'
 import pickleballMjolnirImg from '../images/web/pickleball-mjolnir.jpg'
 import yukiDressImg from '../images/web/yuki-dress.jpg'
 import yukiWithArtImg from '../images/web/yuki-with-art.jpg'
-
-interface AboutMePhaseProps {
-  onPrevPhase: () => void
-  onNextPhase: () => void
-}
 
 interface PhotoCard {
   src: string
@@ -194,17 +190,25 @@ const LIFE_DECKS: LifeDeckItem[] = [
   },
 ]
 
-export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextPhase }) => {
+export const AboutSection: React.FC = () => {
   const [activeDeckIdx, setActiveDeckIdx] = useState<number | null>(null)
   const [activePhotoIdx, setActivePhotoIdx] = useState(0)
 
   const modalRef = useRef<HTMLDivElement>(null)
   const triggerElRef = useRef<HTMLElement | null>(null)
   const wasOpenRef = useRef(false)
-  const photoTouchStartRef = useRef<{ x: number; y: number } | null>(null)
 
   const activeDeck = activeDeckIdx !== null ? LIFE_DECKS[activeDeckIdx] ?? null : null
   const activePhoto = activeDeck ? activeDeck.photos[activePhotoIdx] ?? activeDeck.photos[0] : null
+
+  const photoSlides: CarouselSlide[] = useMemo(() => {
+    if (!activeDeck) return []
+    return activeDeck.photos.map((photo) => ({
+      kind: 'image',
+      src: photo.src,
+      label: photo.title,
+    }))
+  }, [activeDeck])
 
   useEffect(() => {
     setActivePhotoIdx(0)
@@ -233,11 +237,11 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
       if (e.key === 'Escape') {
         e.preventDefault()
         setActiveDeckIdx(null)
-      } else if (e.key === 'ArrowLeft') {
+      } else if (e.key === 'ArrowLeft' && activeDeck.photos.length > 1) {
         e.preventDefault()
         duelSfx.playHover()
         setActivePhotoIdx((prev) => (prev - 1 + activeDeck.photos.length) % activeDeck.photos.length)
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === 'ArrowRight' && activeDeck.photos.length > 1) {
         e.preventDefault()
         duelSfx.playHover()
         setActivePhotoIdx((prev) => (prev + 1) % activeDeck.photos.length)
@@ -286,12 +290,6 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
     setActiveDeckIdx(idx)
   }
 
-  const stepPhoto = (delta: -1 | 1) => {
-    if (!activeDeck) return
-    duelSfx.playHover()
-    setActivePhotoIdx((prev) => (prev + delta + activeDeck.photos.length) % activeDeck.photos.length)
-  }
-
   const modalNode =
     activeDeck && activePhoto && typeof document !== 'undefined'
       ? createPortal(
@@ -311,31 +309,10 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
               onClick={(e) => e.stopPropagation()}
               className="ygo-modal-summon relative flex max-h-[84dvh] w-[min(1040px,94vw)] flex-col overflow-y-auto overscroll-contain rounded-[3px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-2xl focus:outline-none md:grid md:h-[min(74dvh,590px)] md:grid-cols-[1.32fr_1fr] md:grid-rows-[minmax(0,1fr)] md:overflow-hidden"
             >
-              {/* Sticky Mobile Header: keeps within-deck photo navigation and Close X reachable */}
               <div className="sticky top-0 z-20 flex shrink-0 items-center justify-between gap-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]/95 px-3.5 py-2.5 backdrop-blur-md md:hidden">
-                <div className="flex items-center gap-2 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => stepPhoto(-1)}
-                    className="inline-flex h-8 items-center gap-0.5 rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2 font-medium text-[var(--text-main)] transition hover:border-[var(--border-hover)]"
-                    aria-label="Previous photo"
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                    <span>Prev</span>
-                  </button>
-                  <span className="font-mono-tech text-[11px] text-[var(--text-muted)]">
-                    Page {activePhotoIdx + 1} / {activeDeck.photos.length}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => stepPhoto(1)}
-                    className="inline-flex h-8 items-center gap-0.5 rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2 font-medium text-[var(--text-main)] transition hover:border-[var(--border-hover)]"
-                    aria-label="Next photo"
-                  >
-                    <span>Next</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
+                <span className="min-w-0 truncate text-xs font-semibold text-[var(--text-main)]">
+                  {activeDeck.title}
+                </span>
 
                 <button
                   type="button"
@@ -350,88 +327,25 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
                 </button>
               </div>
 
-              {/* LEFT COLUMN: Landscape Photo Stage + Swipe + Minimal Dot Indicators (no bloated pill bar) */}
-              <div className="flex min-h-0 flex-col border-b border-[var(--border-subtle)] bg-[var(--bg-muted)]/45 md:border-b-0 md:border-r">
-                <div
-                  onTouchStart={(e) => {
-                    const t = e.touches[0]
-                    photoTouchStartRef.current = { x: t.clientX, y: t.clientY }
-                  }}
-                  onTouchEnd={(e) => {
-                    const start = photoTouchStartRef.current
-                    photoTouchStartRef.current = null
-                    if (!start || activeDeck.photos.length <= 1) return
-                    const t = e.changedTouches[0]
-                    const dx = t.clientX - start.x
-                    const dy = t.clientY - start.y
-                    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.3) {
-                      stepPhoto(dx < 0 ? 1 : -1)
-                    }
-                  }}
-                  className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-3 sm:p-4"
-                >
-                  <img
-                    key={activePhoto.src}
-                    src={activePhoto.src}
-                    alt={activePhoto.title}
-                    className="ygo-media-fade h-auto max-h-[36dvh] w-auto max-w-full rounded-[2px] object-contain shadow-sm md:max-h-full"
-                  />
-
-                  {activeDeck.photos.length > 1 && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => stepPhoto(-1)}
-                        aria-label="Previous photo"
-                        className="absolute left-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[2px] border border-white/25 bg-black/55 text-white transition hover:bg-black/75"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => stepPhoto(1)}
-                        aria-label="Next photo"
-                        className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-[2px] border border-white/25 bg-black/55 text-white transition hover:bg-black/75"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </>
-                  )}
-                </div>
-
-                {activeDeck.photos.length > 1 && (
-                  <div className="flex shrink-0 items-center justify-center gap-2 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]/80 px-4 py-2.5">
-                    {activeDeck.photos.map((photo, idx) => (
-                      <button
-                        key={photo.title}
-                        type="button"
-                        aria-label={`View ${photo.title}`}
-                        onClick={() => {
-                          duelSfx.playHover()
-                          setActivePhotoIdx(idx)
-                        }}
-                        className={`h-2 rounded-full transition-all ${
-                          idx === activePhotoIdx
-                            ? 'w-5 bg-[var(--accent-silver)]'
-                            : 'w-2 bg-[var(--border-hover)] hover:bg-[var(--text-secondary)]'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                )}
+              <div className="min-h-0 border-b border-[var(--border-subtle)] bg-[var(--bg-muted)]/45 md:border-b-0 md:border-r">
+                <MediaCarousel
+                  slides={photoSlides}
+                  activeIdx={activePhotoIdx}
+                  onChangeIdx={setActivePhotoIdx}
+                  altPrefix={activeDeck.title}
+                  stageClassName="h-full min-h-[220px] p-3 sm:p-4"
+                  imgClassName="max-h-[38dvh] rounded-[2px] shadow-sm md:max-h-full"
+                />
               </div>
 
-              {/* RIGHT COLUMN: Story Info + Active Photo Caption + Within-Deck Page Indicator */}
-              <div className="flex min-h-0 flex-col justify-between">
+              <div className="flex min-h-0 flex-col">
                 <div className="hidden shrink-0 items-start justify-between gap-4 border-b border-[var(--border-subtle)] px-6 py-4 md:flex">
-                  <div className="min-w-0">
-                    <h2
-                      id="life-deck-modal-title"
-                      className="font-editorial text-2xl leading-tight text-[var(--text-main)]"
-                    >
-                      {activeDeck.title}
-                    </h2>
-                  </div>
+                  <h2
+                    id="life-deck-modal-title"
+                    className="font-editorial text-2xl leading-tight text-[var(--text-main)]"
+                  >
+                    {activeDeck.title}
+                  </h2>
 
                   <button
                     type="button"
@@ -465,32 +379,6 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
                       {activePhoto.caption}
                     </p>
                   </div>
-                </div>
-
-                <div className="hidden shrink-0 items-center justify-between border-t border-[var(--border-subtle)] px-6 py-3.5 text-xs md:flex">
-                  <button
-                    type="button"
-                    onClick={() => stepPhoto(-1)}
-                    className="inline-flex items-center gap-1 font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-main)]"
-                    aria-label="Previous photo"
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                    <span>Prev</span>
-                  </button>
-
-                  <span className="font-mono-tech text-[11px] text-[var(--text-muted)]">
-                    Page {activePhotoIdx + 1} of {activeDeck.photos.length}
-                  </span>
-
-                  <button
-                    type="button"
-                    onClick={() => stepPhoto(1)}
-                    className="inline-flex items-center gap-1 font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-main)]"
-                    aria-label="Next photo"
-                  >
-                    <span>Next</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
                 </div>
               </div>
             </div>
@@ -533,32 +421,6 @@ export const AboutMePhase: React.FC<AboutMePhaseProps> = ({ onPrevPhase, onNextP
           ))}
         </div>
       </section>
-
-      {/* Phase Footer Navigation */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] pt-6 sm:pt-8">
-        <button
-          type="button"
-          onClick={() => {
-            duelSfx.playHover()
-            onPrevPhase()
-          }}
-          className="rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-2 text-xs font-medium text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--text-main)]"
-        >
-          ← Experience
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            duelSfx.playHover()
-            onNextPhase()
-          }}
-          className="inline-flex items-center gap-2 rounded-[2px] bg-[var(--btn-primary-bg)] px-5 py-2.5 text-xs font-semibold text-[var(--btn-primary-text)] transition hover:opacity-90"
-        >
-          <span>Contact &amp; GitHub</span>
-          <ArrowRight className="h-4 w-4" />
-        </button>
-      </div>
 
       {modalNode}
     </div>

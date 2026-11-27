@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { Check, ChevronLeft, ChevronRight, ChevronUp, RotateCcw } from 'lucide-react'
+import { ChevronUp, RotateCcw } from 'lucide-react'
 import bpExperienceDarkPreview from '../images/phase-previews/bp-experience-dark.png'
 import bpExperiencePreview from '../images/phase-previews/bp-experience.png'
 import dpDrawDarkPreview from '../images/phase-previews/dp-draw-dark.png'
@@ -123,9 +123,6 @@ interface PhaseCardTrayProps {
   theme: 'light' | 'dark'
   onSelectPhase: (phase: PortfolioPhase) => void
   onReplayDraw: () => void
-  onStepPhase?: (delta: -1 | 1) => void
-  canStepPrev?: boolean
-  canStepNext?: boolean
 }
 
 interface PvzFlyState {
@@ -239,9 +236,6 @@ export function PhaseCardTray({
   theme,
   onSelectPhase,
   onReplayDraw,
-  onStepPhase,
-  canStepPrev = true,
-  canStepNext = true,
 }: PhaseCardTrayProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [openAnimKey, setOpenAnimKey] = useState(0)
@@ -317,13 +311,35 @@ export function PhaseCardTray({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsOpen(false)
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        duelSfx.playHover()
+        setHighlightedIdx((prev) => {
+          const next = Math.max(0, prev - 1)
+          syncWindowToIndex(next, visibleCount)
+          return next
+        })
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        duelSfx.playHover()
+        setHighlightedIdx((prev) => {
+          const next = Math.min(PHASE_CARDS.length - 1, prev + 1)
+          syncWindowToIndex(next, visibleCount)
+          return next
+        })
+      } else if (e.key === 'Enter') {
+        const chosen = PHASE_CARDS[highlightedIdx]
+        if (chosen) {
+          e.preventDefault()
+          commitPhase(chosen)
+        }
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [isOpen])
+  }, [highlightedIdx, isOpen, syncWindowToIndex, visibleCount])
 
-  // Plants vs. Zombies Card Zoom First -> Expanding Center-Circle Iris Reveal
+  // Phase transition iris portal
   useEffect(() => {
     if (
       !pvzFly ||
@@ -554,27 +570,8 @@ export function PhaseCardTray({
         role="region"
         aria-label="Duel Phase Card Switcher"
       >
-        {/* Centered Prominent Toggle Handle ("Choose your tab") + Mobile Quick Step Chevrons */}
-        <div className="relative z-10 -mb-[1px] flex items-end justify-center gap-1.5">
-          {!isOpen && onStepPhase && (
-            <button
-              type="button"
-              disabled={!canStepPrev}
-              onClick={() => {
-                duelSfx.playHover()
-                onStepPhase(-1)
-              }}
-              aria-label="Previous tab"
-              className={`pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-t-[4px] border border-b-0 backdrop-blur-md transition disabled:cursor-not-allowed sm:hidden ${
-                isLight
-                  ? 'border-[#94a3b8] bg-[#ffffff] text-[#181a1f] disabled:text-slate-400/50'
-                  : 'border-[#94a3b8]/70 bg-[#0d1322] text-slate-100 disabled:text-slate-500/50'
-              }`}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-          )}
-
+        {/* Centered Toggle Handle */}
+        <div className="relative z-10 -mb-[1px] flex items-end justify-center">
           <button
             id="tour-phase-dock"
             type="button"
@@ -629,25 +626,6 @@ export function PhaseCardTray({
               } ${isOpen ? 'rotate-180' : 'rotate-0'}`}
             />
           </button>
-
-          {!isOpen && onStepPhase && (
-            <button
-              type="button"
-              disabled={!canStepNext}
-              onClick={() => {
-                duelSfx.playHover()
-                onStepPhase(1)
-              }}
-              aria-label="Next tab"
-              className={`pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-t-[4px] border border-b-0 backdrop-blur-md transition disabled:cursor-not-allowed sm:hidden ${
-                isLight
-                  ? 'border-[#94a3b8] bg-[#ffffff] text-[#181a1f] disabled:text-slate-400/50'
-                  : 'border-[#94a3b8]/70 bg-[#0d1322] text-slate-100 disabled:text-slate-500/50'
-              }`}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          )}
         </div>
 
         {/* Full 90vw Docked Drawer Shell */}
@@ -769,14 +747,8 @@ export function PhaseCardTray({
                           }}
                           type="button"
                           tabIndex={isOpen ? 0 : -1}
-                          onClick={() => {
-                            if (isHighlighted) {
-                              commitPhase(item)
-                            } else {
-                              duelSfx.playHover()
-                              setHighlightedIdx(cardIndex)
-                            }
-                          }}
+                          onClick={() => commitPhase(item)}
+                          onMouseEnter={() => setHighlightedIdx(cardIndex)}
                           style={{ animationDelay: `${sliceIdx * 45}ms` }}
                           className={`ygo-card-deal-in group relative flex w-[min(156px,46vw)] shrink-0 flex-col overflow-hidden rounded-[2px] border text-left transition-all duration-200 sm:w-[148px] lg:w-[158px] ${cardStateClass}`}
                         >
@@ -804,27 +776,6 @@ export function PhaseCardTray({
                       aria-hidden="true"
                       className="inline-block h-3 w-3 -translate-x-0.5 rotate-45 border-r-2 border-t-2 border-[#f8fafc] sm:h-3.5 sm:w-3.5"
                     />
-                  </button>
-                </div>
-
-                {/* Bottom Center Confirmation Bar */}
-                <div
-                  className={`mt-3.5 flex items-center justify-center gap-3 border-t pt-3 ${
-                    isLight ? 'border-[#dedad0]' : 'border-white/12'
-                  }`}
-                >
-                  <button
-                    type="button"
-                    tabIndex={isOpen ? 0 : -1}
-                    onClick={() => commitPhase(highlightedCard)}
-                    className={`inline-flex w-full max-w-[230px] items-center justify-center gap-2 rounded-[2px] border px-6 py-2 text-xs font-semibold tracking-wide shadow transition active:scale-[0.98] sm:w-auto sm:min-w-[168px] ${
-                      isLight
-                        ? 'border-[#181a1f] bg-[#181a1f] text-[#ffffff] hover:bg-[#2a2e38]'
-                        : 'border-[#f8fafc] bg-gradient-to-b from-[#f1f5f9] to-[#cbd5e1] text-[#0b0e14] hover:brightness-105'
-                    }`}
-                  >
-                    <Check className="h-3.5 w-3.5" />
-                    <span>Select {highlightedCard.label}</span>
                   </button>
                 </div>
               </div>

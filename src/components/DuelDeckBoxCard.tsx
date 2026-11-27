@@ -55,10 +55,10 @@ export const DuelDeckBoxCard: React.FC<DuelDeckBoxCardProps> = ({
         style={{ backgroundColor: accent }}
       />
 
-      {/* Dueling Nexus style deck art backdrop + centered 3D Deck Box */}
+      {/* Deck art backdrop + centered 3D Deck Box */}
       <div
         className={`relative w-full overflow-hidden border-b border-[var(--border-subtle)] bg-[#0c101a] ${
-          compact ? 'aspect-[16/9]' : 'aspect-[16/10]'
+          compact ? 'h-[76px] sm:h-[88px]' : 'aspect-[16/10]'
         }`}
       >
         <img
@@ -122,37 +122,51 @@ export const DuelDeckBoxCard: React.FC<DuelDeckBoxCardProps> = ({
       </div>
 
       {/* Deck title, count summary & tagline */}
-      <div className={compact ? 'px-3 py-2.5' : 'px-3.5 py-3'}>
-        <h3 className="truncate text-sm font-semibold text-[var(--text-main)] sm:text-[15px]">
-          {title}
-        </h3>
+      <div className={compact ? 'px-2.5 py-2 sm:px-3 sm:py-2.5' : 'px-3.5 py-3'}>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="truncate text-sm font-semibold text-[var(--text-main)] sm:text-[15px]">
+            {title}
+          </h3>
+          {compact && (
+            <span
+              aria-hidden="true"
+              className={`h-2 w-2 shrink-0 rotate-45 rounded-[1px] transition-opacity ${
+                active ? 'opacity-100' : 'opacity-35 group-hover:opacity-80'
+              }`}
+              style={{ backgroundColor: accent }}
+            />
+          )}
+        </div>
         <p className="mt-0.5 font-mono-tech text-[11px] text-[var(--text-secondary)]">
           {countSummary}
         </p>
-        <p className="mt-1 line-clamp-2 text-xs leading-snug text-[var(--text-muted)]">
-          {tagline}
-        </p>
+        {!compact && (
+          <p className="mt-1 line-clamp-2 text-xs leading-snug text-[var(--text-muted)]">
+            {tagline}
+          </p>
+        )}
       </div>
 
-      {/* Action footer bar (Dueling Nexus deck slot bar style) */}
-      <div
-        className={`mt-auto flex items-center justify-between border-t border-[var(--border-subtle)] px-3.5 py-2 text-[11px] font-medium ${
-          active ? 'bg-[var(--bg-muted)] text-[var(--text-main)]' : 'bg-[var(--bg-muted)]/55 text-[var(--text-secondary)]'
-        }`}
-      >
-        <span className="inline-flex items-center gap-1.5">
-          <span
-            aria-hidden="true"
-            className="h-2 w-2 rotate-45 rounded-[1px]"
-            style={{ backgroundColor: accent }}
-          />
-          <span>{active ? 'Selected' : 'Deck Box'}</span>
-        </span>
-        <span className="inline-flex items-center gap-0.5 font-semibold text-[var(--text-main)] transition-transform group-hover:translate-x-0.5">
-          <span>{ctaLabel}</span>
-          <ChevronRight className="h-3.5 w-3.5" />
-        </span>
-      </div>
+      {!compact && (
+        <div
+          className={`mt-auto flex items-center justify-between border-t border-[var(--border-subtle)] px-3.5 py-2 text-[11px] font-medium ${
+            active ? 'bg-[var(--bg-muted)] text-[var(--text-main)]' : 'bg-[var(--bg-muted)]/55 text-[var(--text-secondary)]'
+          }`}
+        >
+          <span className="inline-flex items-center gap-1.5">
+            <span
+              aria-hidden="true"
+              className="h-2 w-2 rotate-45 rounded-[1px]"
+              style={{ backgroundColor: accent }}
+            />
+            <span>{active ? 'Selected' : 'Deck Box'}</span>
+          </span>
+          <span className="inline-flex items-center gap-0.5 font-semibold text-[var(--text-main)] transition-transform group-hover:translate-x-0.5">
+            <span>{ctaLabel}</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+          </span>
+        </div>
+      )}
     </button>
   )
 }
