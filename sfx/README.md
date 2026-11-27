@@ -1,8 +1,9 @@
 # Real Sound Effects & Duelist BGM (`public/sfx/`)
 
-Drop `.mp3` files here (the app loads them silently if present — zero synthetic beeps):
+Audio assets are stored as `.dat` binary MPEG payloads and decoded in-memory via the browser Web Audio API (`fetch()` -> `AudioContext.decodeAudioData()`), avoiding `HTMLAudioElement` (`new Audio`) and `.mp3` requests so download manager extensions (such as IDM) never hijack playback.
 
-1. **`passionate-duelist.mp3`** — Looping background theme (*Passionate Duelist OST*) that fades in softly (`0.22` volume) when the audio toggle is turned on.
-2. **`card-pull.mp3`** — Plays when pulling the top card down from the deck stack.
-3. **`card-reveal.mp3`** — Plays when the Ace card bounces into center with the Golden Light Summon Burst.
-4. **`card-hover.mp3`** — Subtle card flick sound when inspecting a deck card or hovering/tapping actions.
+1. **`passionate-duelist.dat` / `arcv-unstable-thought.dat` / `zone-5ds-remix.dat` / `arcv-resistance.dat` / `gods-anger.dat`** - Looping background OST themes.
+2. **`trump-card-intro.dat`** - Splash Draw Phase intro motif.
+3. **`card-pull.dat`** - Card draw & pull sound effect.
+4. **`card-reveal.dat`** - Ace summon reveal burst sound effect.
+5. **`card-hover.dat`** - Subtle card flick/hover interaction sound effect.
