@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { duelSfx } from '../utils/sfx'
+import { duelSfx } from '../audio'
 
 export interface CarouselSlide {
   kind: 'image' | 'video'

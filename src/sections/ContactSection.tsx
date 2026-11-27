@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Check, Copy, ExternalLink, FileDown, Github, Linkedin, Mail, Phone, Send } from 'lucide-react'
-import { PROFILE } from '../data/deckData'
-import { duelSfx } from '../utils/sfx'
+import { duelSfx } from '../audio'
+import { PROFILE } from '../data'
 
 export const ContactSection: React.FC = () => {
   const [copiedField, setCopiedField] = useState<'email' | 'phone' | null>(null)
@@ -282,3 +282,5 @@ export const ContactSection: React.FC = () => {
     </div>
   )
 }
+
+export default ContactSection

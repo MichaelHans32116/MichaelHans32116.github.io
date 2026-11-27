@@ -1,0 +1,39 @@
+@keyframes ygoCardDealIn {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92) rotate(-1.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+.ygo-card-deal-in {
+  animation: ygoCardDealIn 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ygoCardSheenSweep {
+  0% {
+    transform: translateX(-140%) skewX(-20deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateX(240%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.ygo-card-sheen {
+  animation: ygoCardSheenSweep 1.15s cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ygo-card-deal-in,
+  .ygo-card-sheen {
+    animation: none !important;
+  }
+}

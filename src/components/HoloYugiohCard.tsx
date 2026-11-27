@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react'
+import { duelSfx } from '../audio'
 import frontCardUrl from '../cards/Michael Hans Magbojos-yugioh-card.jpeg'
 import backCardUrl from '../cards/back-image-yugioh.jpg'
-import { duelSfx } from '../utils/sfx'
+import '../styles/cards.css'
 
 export { frontCardUrl, backCardUrl }
 

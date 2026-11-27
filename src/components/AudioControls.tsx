@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Check, Minus, Music, Plus, Volume2, VolumeX } from 'lucide-react'
-import { BGM_TRACKS, BgmMode, BgmTrackId } from '../utils/sfx'
+import { BGM_TRACKS, BgmMode, BgmTrackId } from '../audio'
 
 interface AudioControlsProps {
   bgmMuted: boolean

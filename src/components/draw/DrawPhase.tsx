@@ -1,13 +1,17 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ArrowDown, RotateCcw } from 'lucide-react'
-import hansIdAvatar from '../images/web/michael-hans-id.jpg'
-import { BgmMode, BgmTrackId, duelSfx } from '../utils/sfx'
-import { AudioControls } from './AudioControls'
-import { DuelFieldBg } from './DuelFieldBg'
-import { backCardUrl, frontCardUrl, HoloYugiohCard } from './HoloYugiohCard'
-import { ThemeFlipButton } from './ThemeFlipButton'
-import { YgoBrandEmblem } from './YgoBrandEmblem'
+import { BgmMode, BgmTrackId, duelSfx } from '../../audio'
+import '../../styles/splash.css'
+import { AudioControls } from '../AudioControls'
+import { DuelFieldBg } from '../DuelFieldBg'
+import { backCardUrl, frontCardUrl, HoloYugiohCard } from '../HoloYugiohCard'
+import { ThemeFlipButton } from '../ThemeFlipButton'
+import { YgoBrandEmblem } from '../YgoBrandEmblem'
+import { LifePointsHud } from './LifePointsHud'
+import { LogoSplashOverlay } from './LogoSplashOverlay'
+import { SummonBurst } from './SummonBurst'
+import { TurnBannerOverlay } from './TurnBannerOverlay'
 
 interface DrawPhaseProps {
   onEnterPortfolio: () => void
@@ -27,13 +31,6 @@ interface DrawPhaseProps {
 
 type DrawState = 'idle' | 'animating' | 'revealed' | 'entering'
 type IntroStage = 'logo' | 'your-turn' | 'gliding' | 'ready'
-
-const SUMMON_SPARKS = Array.from({ length: 18 }).map((_, idx) => ({
-  angle: `${idx * 20}deg`,
-  dist: `${-(130 + (idx % 3) * 44)}px`,
-  color: idx % 3 === 0 ? '#93c5fd' : '#e2e8f0',
-  size: idx % 2 === 0 ? 6 : 4,
-}))
 
 export const DrawPhase: React.FC<DrawPhaseProps> = ({
   onEnterPortfolio,
@@ -72,6 +69,7 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
   const hintRef = useRef<HTMLDivElement>(null)
   const revealLayerRef = useRef<HTMLDivElement>(null)
   const popCardRef = useRef<HTMLDivElement>(null)
+  const flashSweepRef = useRef<HTMLDivElement>(null)
   const actionsRef = useRef<HTMLDivElement>(null)
 
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null)
@@ -94,7 +92,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     }, 220)
   }, [introStage])
 
-  // Stage 1: MICHAEL HANS fiery Yu-Gi-Oh! crest -> Stage 2: YOUR TURN!
   useEffect(() => {
     if (introStage !== 'logo') return
     const fadeTimer = window.setTimeout(() => setLogoLeaving(true), 1150)
@@ -105,7 +102,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     }
   }, [introStage])
 
-  // Animate Duel Links LP 0 -> 8000 once splash moves past logo (runs once, never restarts on glide/ready)
   useEffect(() => {
     if (introStage === 'logo' || lpStartedRef.current) return
     lpStartedRef.current = true
@@ -129,7 +125,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     }
     raf = window.requestAnimationFrame(tick)
     return () => {
-      // If component unmounts early, allow re-run only if not yet 8000
       window.cancelAnimationFrame(raf)
     }
   }, [introStage])
@@ -140,9 +135,18 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     const vw = window.innerWidth
     const vh = window.innerHeight
     const deckRect = deckEl?.getBoundingClientRect()
-    const deckCx = deckRect && deckRect.width > 0 && deckRect.width < vw * 0.8 ? deckRect.left + deckRect.width / 2 : vw / 2
-    const deckCy = deckRect && deckRect.height > 0 && deckRect.height < vh * 0.8 ? deckRect.top + deckRect.height / 2 : vh * 0.45
-    const deckW = deckRect && deckRect.width > 0 && deckRect.width < vw * 0.8 ? deckRect.width : Math.min(220, vw * 0.49)
+    const deckCx =
+      deckRect && deckRect.width > 0 && deckRect.width < vw * 0.8
+        ? deckRect.left + deckRect.width / 2
+        : vw / 2
+    const deckCy =
+      deckRect && deckRect.height > 0 && deckRect.height < vh * 0.8
+        ? deckRect.top + deckRect.height / 2
+        : vh * 0.45
+    const deckW =
+      deckRect && deckRect.width > 0 && deckRect.width < vw * 0.8
+        ? deckRect.width
+        : Math.min(220, vw * 0.49)
 
     const isCompact = vw < 640
     const sliceScale = Math.max(Math.min(vw, 1520) / 1440, vh / 860) * 1.04
@@ -229,7 +233,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     glideTlRef.current = tl
   }, [])
 
-  // Pin 3D deck inside bottom-right Deck Zone during logo & YOUR TURN!, then glide on timer
   useLayoutEffect(() => {
     if ((introStage !== 'logo' && introStage !== 'your-turn') || glideStartedRef.current) return
     const stageEl = deckStageRef.current
@@ -282,6 +285,7 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     const pulledEl = pulledCardRef.current
     const revealLayer = revealLayerRef.current
     const popEl = popCardRef.current
+    const flashEl = flashSweepRef.current
     const actionsEl = actionsRef.current
 
     if (prefersReduced || !deckLayer || !pulledEl || !revealLayer || !popEl) {
@@ -310,6 +314,9 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
       rotateZ: -3,
       opacity: 0,
     })
+    if (flashEl) {
+      gsap.set(flashEl, { xPercent: -140, opacity: 0 })
+    }
     if (actionsEl) {
       gsap.set(actionsEl, { opacity: 0, y: 12 })
     }
@@ -354,17 +361,27 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         undefined,
         '-=0.34',
       )
-      .call(() => {
-        setPhase('revealed')
-        if (actionsRef.current) {
-          gsap.to(actionsRef.current, {
-            opacity: 1,
-            y: 0,
-            duration: 0.34,
-            ease: 'power2.out',
-          })
-        }
-      })
+
+    if (flashEl) {
+      tl.fromTo(
+        flashEl,
+        { xPercent: -140, opacity: 0.98 },
+        { xPercent: 160, opacity: 0, duration: 0.62, ease: 'power2.out' },
+        '-=0.28',
+      )
+    }
+
+    tl.call(() => {
+      setPhase('revealed')
+      if (actionsRef.current) {
+        gsap.to(actionsRef.current, {
+          opacity: 1,
+          y: 0,
+          duration: 0.34,
+          ease: 'power2.out',
+        })
+      }
+    })
 
     tlRef.current = tl
   }, [])
@@ -472,6 +489,7 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
       hintRef.current,
       revealLayerRef.current,
       popCardRef.current,
+      flashSweepRef.current,
       actionsRef.current,
     ].filter(Boolean)
     if (els.length > 0) {
@@ -499,7 +517,11 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         }
         return
       }
-      if (introStage === 'ready' && phase === 'idle' && (e.code === 'ArrowDown' || e.code === 'Space' || e.code === 'Enter')) {
+      if (
+        introStage === 'ready' &&
+        phase === 'idle' &&
+        (e.code === 'ArrowDown' || e.code === 'Space' || e.code === 'Enter')
+      ) {
         e.preventDefault()
         duelSfx.unlockAudio()
         runPullAndPopSequence(0, 28)
@@ -550,128 +572,21 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         }
       }}
       className={`splash-canvas relative h-[100dvh] w-full overflow-hidden select-none ${
-        phase === 'revealed' || introStage === 'logo' || introStage === 'your-turn' ? 'cursor-pointer' : ''
+        phase === 'revealed' || introStage === 'logo' || introStage === 'your-turn'
+          ? 'cursor-pointer'
+          : ''
       }`}
     >
-      {/* ARCHITECTURAL YU-GI-OH! DUEL FIELD PLAYMAT (SHARP & UNBLURRED CARDS) */}
       <DuelFieldBg variant="splash" />
 
-      {/* STAGE 1: FIERY RED/METALLIC MICHAEL HANS YU-GI-OH! SPLASH LOGO */}
       {introStage === 'logo' && (
-        <div
-          onClick={(e) => {
-            e.stopPropagation()
-            dismissLogoSplash()
-          }}
-          data-leaving={logoLeaving ? 'true' : 'false'}
-          role="button"
-          tabIndex={0}
-          aria-label="Skip opening emblem"
-          className="ygo-splash-intro splash-canvas fixed inset-0 z-50 flex cursor-pointer flex-col items-center justify-center px-6"
-        >
-          <div className="ygo-logo-enter relative flex flex-col items-center">
-            <div className="relative flex items-center justify-center px-6 py-4">
-              <svg
-                viewBox="0 0 560 170"
-                className="h-auto w-[min(440px,84vw)] drop-shadow-[0_14px_26px_rgba(0,0,0,0.42)]"
-                aria-hidden="true"
-              >
-                <defs>
-                  <linearGradient id="ygoFlameGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="var(--logo-flame-top)" />
-                    <stop offset="55%" stopColor="var(--logo-flame-mid)" />
-                    <stop offset="100%" stopColor="var(--logo-flame-dark)" />
-                  </linearGradient>
-                  <linearGradient id="ygoSilverRim" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#f8fafc" />
-                    <stop offset="50%" stopColor="#cbd5e1" />
-                    <stop offset="100%" stopColor="#64748b" />
-                  </linearGradient>
-                </defs>
-                <polygon
-                  points="24,96 76,34 114,56 168,14 218,52 280,10 342,52 392,14 446,56 484,34 536,96 474,116 502,156 402,130 342,162 280,126 218,162 158,130 58,156 86,116"
-                  fill="url(#ygoFlameGrad)"
-                  stroke="var(--logo-stroke)"
-                  strokeWidth="8"
-                  strokeLinejoin="miter"
-                />
-                <polygon
-                  points="58,94 98,52 132,68 176,34 220,64 280,28 340,64 384,34 428,68 462,52 502,94 454,110 472,138 394,118 340,144 280,114 220,144 166,118 88,138 106,110"
-                  fill="none"
-                  stroke="url(#ygoSilverRim)"
-                  strokeWidth="2.4"
-                  opacity="0.82"
-                />
-              </svg>
-
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
-                <span
-                  className="relative select-none px-4 text-center text-[clamp(1.65rem,6.2vw,3.1rem)] font-black tracking-[0.06em] uppercase"
-                  style={{
-                    fontFamily: 'var(--font-ygo-title)',
-                    color: '#f8fafc',
-                    WebkitTextStroke: '1.8px #111111',
-                    textShadow:
-                      '0 2px 0 #111111, 0 4px 0 rgba(0,0,0,0.65), 0 0 18px rgba(226, 232, 240, 0.45)',
-                  }}
-                >
-                  MICHAEL HANS
-                </span>
-                <span className="ygo-logo-sheen pointer-events-none absolute inset-y-2 w-20 bg-gradient-to-r from-transparent via-white/75 to-transparent blur-[2px]" />
-              </div>
-            </div>
-          </div>
-        </div>
+        <LogoSplashOverlay leaving={logoLeaving} onDismiss={dismissLogoSplash} />
       )}
 
-      {/* STAGE 2: NON-OPAQUE SILVER YU-GI-OH! "YOUR TURN!" SLASH OVERLAY */}
       {introStage === 'your-turn' && (
-        <div
-          data-leaving={turnLeaving ? 'true' : 'false'}
-          className="ygo-turn-banner pointer-events-none fixed inset-0 z-30 flex flex-col items-center justify-center px-6"
-        >
-          <div className="relative flex w-[min(560px,88vw)] flex-col items-center gap-3 py-5">
-            <div
-              aria-hidden="true"
-              className="ygo-turn-line h-[1.5px] w-full"
-              style={{
-                background:
-                  'linear-gradient(90deg, transparent 0%, var(--accent-silver) 28%, var(--accent-silver-bright) 50%, var(--accent-silver) 72%, transparent 100%)',
-              }}
-            />
-
-            <div className="relative flex items-center justify-center overflow-hidden px-3 py-1">
-              <h1
-                className="ygo-turn-text relative select-none text-center text-[clamp(2.1rem,7.8vw,4rem)] font-black uppercase"
-                style={{
-                  fontFamily: 'var(--font-ygo-title)',
-                  background: 'linear-gradient(180deg, #ffffff 0%, #e2e8f0 48%, #94a3b8 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  filter:
-                    theme === 'dark'
-                      ? 'drop-shadow(0 3px 0 #05070d) drop-shadow(0 0 22px rgba(226,232,240,0.42))'
-                      : 'drop-shadow(0 2px 0 rgba(15,23,42,0.72)) drop-shadow(0 8px 20px rgba(15,23,42,0.22))',
-                }}
-              >
-                YOUR TURN!
-              </h1>
-              <span className="ygo-logo-sheen pointer-events-none absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-white/75 to-transparent blur-[2px]" />
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="ygo-turn-line h-[1.5px] w-full"
-              style={{
-                background:
-                  'linear-gradient(90deg, transparent 0%, var(--accent-silver) 28%, var(--accent-silver-bright) 50%, var(--accent-silver) 72%, transparent 100%)',
-              }}
-            />
-          </div>
-        </div>
+        <TurnBannerOverlay leaving={turnLeaving} theme={theme} />
       )}
 
-      {/* Anchored Top-Left Yu-Gi-Oh! Identity Emblem */}
       <button
         type="button"
         onClick={(e) => {
@@ -686,7 +601,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         <YgoBrandEmblem />
       </button>
 
-      {/* Top-Right Controls ("Skip intro" hides automatically once pulled!) */}
       <div
         className="absolute right-4 top-3.5 z-40 flex items-center gap-1.5 sm:right-7 sm:top-5 sm:gap-2"
         onClick={(e) => e.stopPropagation()}
@@ -721,44 +635,8 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         )}
       </div>
 
-      {/* Duel Links style LP: 8000 HUD at Bottom-Left */}
-      {introStage !== 'logo' && phase !== 'entering' && (
-        <div
-          aria-label="Life Points 8000"
-          className="pointer-events-none fixed bottom-3.5 left-3.5 z-30 flex items-center sm:bottom-6 sm:left-7"
-        >
-          <div className="relative z-10 h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-sky-300 bg-white shadow-[0_6px_18px_rgba(2,132,199,0.45)] sm:h-12 sm:w-12">
-            <img
-              src={hansIdAvatar}
-              alt="Michael Hans"
-              className="h-full w-full object-cover object-top"
-              draggable={false}
-            />
-          </div>
-          <div
-            className="-ml-4 flex items-baseline gap-1.5 border-2 border-sky-300/85 py-1 pl-6 pr-3.5 shadow-[0_8px_22px_rgba(2,132,199,0.4)] sm:-ml-5 sm:gap-2 sm:py-1.5 sm:pl-7 sm:pr-5"
-            style={{
-              background: 'linear-gradient(100deg, #071326 0%, #0e2e5c 52%, #083d77 100%)',
-              transform: 'skewX(-12deg)',
-            }}
-          >
-            <span
-              className="font-mono-tech text-[10px] font-bold tracking-wider text-sky-300 italic sm:text-xs"
-              style={{ transform: 'skewX(12deg)' }}
-            >
-              LP:
-            </span>
-            <span
-              className="font-mono-tech text-base font-extrabold tracking-tight text-white tabular-nums sm:text-xl"
-              style={{ transform: 'skewX(12deg)' }}
-            >
-              {lpValue}
-            </span>
-          </div>
-        </div>
-      )}
+      {introStage !== 'logo' && phase !== 'entering' && <LifePointsHud lpValue={lpValue} />}
 
-      {/* LAYER 1: 3D ANGLED STACKED DECK ON DUEL FIELD (GLIDES FROM BOTTOM-RIGHT SLOT -> CENTER!) */}
       <div
         ref={deckLayerRef}
         className={`absolute inset-0 z-10 flex flex-col items-center justify-center px-6 pt-16 pb-10 sm:px-4 sm:pb-8 ${
@@ -824,6 +702,12 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
                 className="h-full w-full object-cover"
                 draggable={false}
               />
+              {(dragState === 'pulling' || dragState === 'ready') && (
+                <div
+                  aria-hidden="true"
+                  className="pull-deck-shine pointer-events-none absolute inset-0 z-20"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -855,7 +739,6 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
         </div>
       </div>
 
-      {/* LAYER 2: DEAD-CENTER REVEAL, CLICK ANYWHERE TO PROCEED */}
       <div
         ref={revealLayerRef}
         style={{ perspective: 1200 }}
@@ -867,35 +750,9 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
           ref={popCardRef}
           className="relative aspect-[59/86] w-[min(268px,62vw,calc(54dvh*59/86))] sm:w-[min(280px,68vw,calc(58dvh*59/86))]"
         >
-          {burstKey > 0 && (
-            <div
-              key={burstKey}
-              aria-hidden="true"
-              className="pointer-events-none absolute left-1/2 top-1/2 z-0 flex h-[min(540px,130vw)] w-[min(540px,130vw)] -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-            >
-              <div className="summon-flash absolute inset-12 rounded-full" />
-              <div className="summon-rays absolute inset-0 rounded-full" />
-              <div className="summon-ring absolute h-[52%] w-[52%] rounded-full" />
-              {SUMMON_SPARKS.map((spark, i) => (
-                <span
-                  key={i}
-                  className="summon-spark absolute rounded-full"
-                  style={
-                    {
-                      width: `${spark.size}px`,
-                      height: `${spark.size}px`,
-                      backgroundColor: spark.color,
-                      boxShadow: `0 0 10px ${spark.color}`,
-                      '--spark-angle': spark.angle,
-                      '--spark-dist': spark.dist,
-                    } as React.CSSProperties
-                  }
-                />
-              ))}
-            </div>
-          )}
+          <SummonBurst burstKey={burstKey} />
 
-          <div className="relative z-10 h-full w-full">
+          <div className="relative z-10 h-full w-full overflow-hidden rounded-[2px]">
             {phase === 'revealed' || phase === 'entering' ? (
               <HoloYugiohCard flippable={false} />
             ) : (
@@ -908,10 +765,15 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
                 />
               </div>
             )}
+
+            <div
+              ref={flashSweepRef}
+              aria-hidden="true"
+              className="draw-flash-sweep pointer-events-none absolute inset-0 z-30"
+            />
           </div>
         </div>
 
-        {/* Minimal Footer: Click anywhere to enter Home, or Pull again */}
         <div
           ref={actionsRef}
           className={`absolute inset-x-0 bottom-6 z-30 flex flex-col items-center gap-2.5 px-4 sm:bottom-7 sm:gap-3 ${
@@ -938,3 +800,5 @@ export const DrawPhase: React.FC<DrawPhaseProps> = ({
     </div>
   )
 }
+
+export default DrawPhase

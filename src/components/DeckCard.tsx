@@ -1,7 +1,8 @@
 import React, { useId, useRef, useState } from 'react'
 import { Award, ClipboardCheck, ShieldCheck, UserCheck } from 'lucide-react'
-import { CardCategory, DeckCardItem } from '../data/deckData'
-import { duelSfx } from '../utils/sfx'
+import { duelSfx } from '../audio'
+import { CardCategory, DeckCardItem } from '../data'
+import '../styles/cards.css'
 
 const customGlob = import.meta.glob('../cards/custom/*.{png,jpg,jpeg,webp}', {
   eager: true,

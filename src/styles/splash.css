@@ -1,0 +1,275 @@
+[data-theme="light"] .splash-canvas {
+  background:
+    radial-gradient(circle at 50% 42%, var(--splash-aura-2) 0%, transparent 52%),
+    radial-gradient(circle at 80% 18%, var(--splash-aura-1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 45%, #ffffff 0%, #f6f3eb 65%, #eae5d7 100%);
+}
+
+[data-theme="dark"] .splash-canvas {
+  background:
+    radial-gradient(circle at 50% 42%, var(--splash-aura-1) 0%, transparent 56%),
+    radial-gradient(circle at 20% 80%, var(--splash-aura-2) 0%, transparent 48%),
+    radial-gradient(circle at 50% 45%, #161b26 0%, #0b0e15 74%);
+}
+
+@keyframes ygoSplashLogoEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.84);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ygoSplashSheen {
+  0% {
+    transform: translateX(-140%) skewX(-22deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateX(220%) skewX(-22deg);
+    opacity: 0;
+  }
+}
+
+.ygo-splash-intro {
+  transition: opacity 380ms cubic-bezier(0.22, 1, 0.36, 1), transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ygo-splash-intro[data-leaving='true'] {
+  opacity: 0;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+.ygo-logo-enter {
+  animation: ygoSplashLogoEnter 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ygo-logo-sheen {
+  animation: ygoSplashSheen 1050ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
+}
+
+@keyframes ygoYourTurnEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(8px);
+    letter-spacing: 0.22em;
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.03) translateY(0);
+    letter-spacing: 0.12em;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    letter-spacing: 0.14em;
+  }
+}
+
+@keyframes ygoTurnLineExpand {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.ygo-turn-banner {
+  transition: opacity 260ms cubic-bezier(0.22, 1, 0.36, 1), transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ygo-turn-banner[data-leaving='true'] {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.ygo-turn-text {
+  animation: ygoYourTurnEnter 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ygo-turn-line {
+  animation: ygoTurnLineExpand 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pullDownHint {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+.pull-arrow-bounce {
+  animation: pullDownHint 1.5s ease-in-out infinite;
+}
+
+/* Card-pull diagonal drag sheen & summon foil shine sweep */
+@keyframes pullDeckShineSweep {
+  0% {
+    transform: translateX(-140%) skewX(-20deg);
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+    opacity: 0.25;
+  }
+}
+
+.pull-deck-shine {
+  background: linear-gradient(
+    115deg,
+    transparent 18%,
+    rgba(255, 255, 255, 0.18) 38%,
+    rgba(243, 218, 139, 0.6) 50%,
+    rgba(255, 255, 255, 0.22) 62%,
+    transparent 82%
+  );
+  animation: pullDeckShineSweep 1.1s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.draw-flash-sweep {
+  background: linear-gradient(
+    115deg,
+    transparent 18%,
+    rgba(226, 232, 240, 0.5) 42%,
+    rgba(255, 255, 255, 0.96) 50%,
+    rgba(243, 218, 139, 0.56) 58%,
+    transparent 82%
+  );
+}
+
+@keyframes summonRayPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.42) rotate(0deg);
+  }
+  25% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7) rotate(24deg);
+  }
+}
+
+@keyframes summonRingExpand {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.85);
+  }
+}
+
+@keyframes summonSparkOut {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--spark-angle)) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--spark-angle)) translateY(var(--spark-dist)) scale(0.15);
+  }
+}
+
+@keyframes summonFlashPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  28% {
+    opacity: 0.92;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+.summon-rays {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 14deg,
+    rgba(226, 232, 240, 0.48) 18deg,
+    transparent 24deg 48deg,
+    rgba(147, 197, 253, 0.28) 52deg,
+    transparent 58deg 88deg,
+    rgba(241, 245, 249, 0.44) 92deg,
+    transparent 98deg 132deg,
+    rgba(148, 163, 184, 0.36) 136deg,
+    transparent 142deg 178deg,
+    rgba(147, 197, 253, 0.28) 182deg,
+    transparent 188deg 224deg,
+    rgba(226, 232, 240, 0.46) 228deg,
+    transparent 234deg 268deg,
+    rgba(148, 163, 184, 0.36) 272deg,
+    transparent 278deg 315deg,
+    rgba(241, 245, 249, 0.4) 320deg,
+    transparent 326deg 360deg
+  );
+  mask-image: radial-gradient(circle, transparent 16%, black 38%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle, transparent 16%, black 38%, transparent 72%);
+  animation: summonRayPulse 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.summon-ring {
+  border: 2px solid rgba(226, 232, 240, 0.78);
+  box-shadow: 0 0 28px rgba(148, 163, 184, 0.45);
+  animation: summonRingExpand 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.summon-spark {
+  animation: summonSparkOut 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.summon-flash {
+  background: radial-gradient(
+    circle,
+    rgba(248, 250, 252, 0.82) 0%,
+    rgba(203, 213, 225, 0.36) 36%,
+    transparent 70%
+  );
+  animation: summonFlashPulse 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pull-arrow-bounce,
+  .pull-deck-shine,
+  .ygo-logo-enter,
+  .ygo-logo-sheen,
+  .ygo-splash-intro,
+  .ygo-turn-banner,
+  .ygo-turn-text,
+  .ygo-turn-line,
+  .summon-flash,
+  .summon-rays,
+  .summon-ring,
+  .summon-spark {
+    animation: none !important;
+    transition: none !important;
+  }
+}

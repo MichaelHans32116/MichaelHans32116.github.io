@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
-import { DECK_CARDS, DeckCardItem } from '../data/deckData'
-import { duelSfx } from '../utils/sfx'
+import { duelSfx } from '../audio'
+import { DECK_CARDS, DeckCardItem } from '../data'
 
 interface ToolEntry {
   name: string

@@ -1,202 +1,15 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import { duelSfx } from '../audio'
 import { DuelDeckBoxCard } from '../components/DuelDeckBoxCard'
 import { CarouselSlide, MediaCarousel } from '../components/MediaCarousel'
-import { duelSfx } from '../utils/sfx'
-import boseQcUltraImg from '../images/web/bose-qc-ultra.jpg'
-import chessMatchImg from '../images/web/chess-match.jpg'
-import evangelismDrawingImg from '../images/web/evangelism-drawing.jpg'
-import evangelismKidsImg from '../images/web/evangelism-kids.jpg'
-import evangelismVisitImg from '../images/web/evangelism-visit.jpg'
-import favoriteArtImg from '../images/web/favorite-art.jpg'
-import friendsCafeImg from '../images/web/friends-cafe.jpg'
-import friendsGroupImg from '../images/web/friends-group.jpg'
-import friendsPizzaImg from '../images/web/friends-pizza.jpg'
-import genshinCoopImg from '../images/web/genshin-coop.jpg'
-import howconnectGroupImg from '../images/web/howconnect-group.jpg'
-import pickleballMjolnirImg from '../images/web/pickleball-mjolnir.jpg'
-import yukiDressImg from '../images/web/yuki-dress.jpg'
-import yukiWithArtImg from '../images/web/yuki-with-art.jpg'
-
-interface PhotoCard {
-  src: string
-  title: string
-  caption: string
-  objectMode?: 'cover-top' | 'cover-center' | 'contain-art'
-}
-
-interface LifeDeckItem {
-  id: string
-  title: string
-  deckTypeLabel: string
-  boxCode: string
-  countSummary: string
-  tagline: string
-  story: string
-  coverSrc: string
-  coverMode?: 'cover-top' | 'cover-center' | 'contain-art'
-  accent: string
-  photos: PhotoCard[]
-}
-
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-
-const LIFE_DECKS: LifeDeckItem[] = [
-  {
-    id: 'church',
-    title: 'Church & Outreach',
-    deckTypeLabel: 'FAITH DECK',
-    boxCode: 'FAITH',
-    countSummary: '4 Photos',
-    tagline: 'House of Worship LB, Sat Masili & Sun Sucol',
-    story:
-      'I play piano at House of Worship Los Baños and help lead barangay outreach. Funny enough, they are also the real client behind my HoW Connect app. Every Saturday I am in Barangay Masili and every Sunday in Barangay Sucol for kids ministry and house-to-house visits.',
-    coverSrc: evangelismKidsImg,
-    coverMode: 'cover-top',
-    accent: '#2563eb',
-    photos: [
-      {
-        src: evangelismKidsImg,
-        title: 'Barangay Kids Ministry',
-        caption: 'Saturdays in Barangay Masili and Sundays in Barangay Sucol. Loud kids, nonstop energy.',
-        objectMode: 'cover-top',
-      },
-      {
-        src: evangelismDrawingImg,
-        title: 'Coloring & Bible Stories',
-        caption: 'Crayons on the floor while teaching the kids every weekend.',
-        objectMode: 'cover-center',
-      },
-      {
-        src: evangelismVisitImg,
-        title: 'House-to-House Outreach',
-        caption: 'Visiting nanays and families across the barangay for soul-winning outreach.',
-        objectMode: 'cover-top',
-      },
-      {
-        src: howconnectGroupImg,
-        title: 'HoW Los Baños & HoW Connect',
-        caption: 'Home church, barangay crew, and the actual client behind HoW Connect.',
-        objectMode: 'cover-top',
-      },
-    ],
-  },
-  {
-    id: 'friends',
-    title: 'Friends & Food Trips',
-    deckTypeLabel: 'SQUAD DECK',
-    boxCode: 'SQUAD',
-    countSummary: '3 Photos',
-    tagline: 'Dinner runs, pizza nights & late cafes',
-    story:
-      'Most of my favorite memories happen around crowded dinner tables after surviving exams or defenses, sharing pizza boxes, and hanging out at cafes until late.',
-    coverSrc: friendsGroupImg,
-    coverMode: 'cover-top',
-    accent: '#0f766e',
-    photos: [
-      {
-        src: friendsGroupImg,
-        title: 'Full Table Dinner Run',
-        caption: 'Post-exam rule: nobody leaves the Pizza Hut table hungry.',
-        objectMode: 'cover-top',
-      },
-      {
-        src: friendsPizzaImg,
-        title: 'After-Class Pizza',
-        caption: 'Same squad, looser ties, no code talk for at least 20 minutes.',
-        objectMode: 'cover-top',
-      },
-      {
-        src: friendsCafeImg,
-        title: 'Late-Night Cafe',
-        caption: 'Started as a normal hangout, ended up sketching app ideas again.',
-        objectMode: 'cover-top',
-      },
-    ],
-  },
-  {
-    id: 'yuki',
-    title: 'Yuki & Birthday Art',
-    deckTypeLabel: 'COMPANION DECK',
-    boxCode: 'YUKI',
-    countSummary: '3 Photos',
-    tagline: 'Favorite dog Yuki & 21st birthday drawing',
-    story:
-      'Yuki is my favorite dog and basically runs our house in her blue gingham dress. Right beside her is my favorite art piece: a 21st birthday drawing I commissioned from one of my favorite people, starring Yuki on top of the cake.',
-    coverSrc: favoriteArtImg,
-    coverMode: 'contain-art',
-    accent: '#b45309',
-    photos: [
-      {
-        src: favoriteArtImg,
-        title: '21st Birthday Commission',
-        caption: 'Commissioned from one of my favorite people, starring Yuki on the cake.',
-        objectMode: 'contain-art',
-      },
-      {
-        src: yukiWithArtImg,
-        title: 'Yuki Meets Her Drawing',
-        caption: 'Holding the printed birthday art right beside the actual model.',
-        objectMode: 'cover-top',
-      },
-      {
-        src: yukiDressImg,
-        title: 'Yuki in Full Outfit',
-        caption: '10/10 polite dog, zero coding skills, huge morale boost.',
-        objectMode: 'cover-top',
-      },
-    ],
-  },
-  {
-    id: 'hobbies',
-    title: 'Gear & Hobbies',
-    deckTypeLabel: 'HOBBY DECK',
-    boxCode: 'GEAR',
-    countSummary: '4 Photos',
-    tagline: 'Bose QC Ultra, Mjolnir 16cm, Chess & Genshin',
-    story:
-      'Outside dev work I rotate between my Bose QuietComfort Ultra and Sony WH-1000XM5 headphones, my Mjolnir 16cm wide-frame pickleball paddle, weekend chess, and Genshin co-op with friends.',
-    coverSrc: boseQcUltraImg,
-    coverMode: 'cover-center',
-    accent: '#6d28d9',
-    photos: [
-      {
-        src: boseQcUltraImg,
-        title: 'Bose QC Ultra & WH-1000XM5',
-        caption: 'My two go-to headphones for deep coding sessions and blocking commute noise.',
-        objectMode: 'cover-center',
-      },
-      {
-        src: pickleballMjolnirImg,
-        title: 'Mjolnir 16cm Wide-Frame',
-        caption: 'Enflexy Mjolnir widebody pickleball paddle. Big sweet spot and a fun name.',
-        objectMode: 'cover-center',
-      },
-      {
-        src: chessMatchImg,
-        title: 'Over-the-Board Chess',
-        caption: 'Good practice for staying patient and spotting traps early.',
-        objectMode: 'cover-top',
-      },
-      {
-        src: genshinCoopImg,
-        title: 'Genshin Co-Op',
-        caption: 'Running domains and boss fights with friends after pushing updates.',
-        objectMode: 'cover-center',
-      },
-    ],
-  },
-]
+import { LIFE_DECKS } from '../data'
+import { useModalDialog } from '../hooks/useModalDialog'
 
 export const AboutSection: React.FC = () => {
   const [activeDeckIdx, setActiveDeckIdx] = useState<number | null>(null)
   const [activePhotoIdx, setActivePhotoIdx] = useState(0)
-
-  const modalRef = useRef<HTMLDivElement>(null)
-  const triggerElRef = useRef<HTMLElement | null>(null)
-  const wasOpenRef = useRef(false)
 
   const activeDeck = activeDeckIdx !== null ? LIFE_DECKS[activeDeckIdx] ?? null : null
   const activePhoto = activeDeck ? activeDeck.photos[activePhotoIdx] ?? activeDeck.photos[0] : null
@@ -214,78 +27,28 @@ export const AboutSection: React.FC = () => {
     setActivePhotoIdx(0)
   }, [activeDeckIdx])
 
-  useEffect(() => {
-    const isOpen = activeDeck !== null
-    if (isOpen && !wasOpenRef.current) {
-      window.requestAnimationFrame(() => {
-        modalRef.current?.focus()
-      })
-    } else if (!isOpen && wasOpenRef.current) {
-      const trigger = triggerElRef.current
-      triggerElRef.current = null
-      if (trigger && trigger.isConnected) {
-        trigger.focus()
-      }
-    }
-    wasOpenRef.current = isOpen
-  }, [activeDeck])
+  const closeModal = useCallback(() => {
+    setActiveDeckIdx(null)
+  }, [])
 
-  useEffect(() => {
-    if (!activeDeck) return
+  const stepPhoto = useCallback(
+    (delta: -1 | 1) => {
+      if (!activeDeck || activeDeck.photos.length <= 1) return
+      setActivePhotoIdx((prev) => (prev + delta + activeDeck.photos.length) % activeDeck.photos.length)
+    },
+    [activeDeck],
+  )
 
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault()
-        setActiveDeckIdx(null)
-      } else if (e.key === 'ArrowLeft' && activeDeck.photos.length > 1) {
-        e.preventDefault()
-        duelSfx.playHover()
-        setActivePhotoIdx((prev) => (prev - 1 + activeDeck.photos.length) % activeDeck.photos.length)
-      } else if (e.key === 'ArrowRight' && activeDeck.photos.length > 1) {
-        e.preventDefault()
-        duelSfx.playHover()
-        setActivePhotoIdx((prev) => (prev + 1) % activeDeck.photos.length)
-      } else if (e.key === 'Tab' && modalRef.current) {
-        const focusables = Array.from(
-          modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-        ).filter((el) => el.offsetParent !== null || el === document.activeElement)
-
-        if (focusables.length === 0) {
-          e.preventDefault()
-          modalRef.current.focus()
-          return
-        }
-
-        const first = focusables[0]
-        const last = focusables[focusables.length - 1]
-        const active = document.activeElement as HTMLElement | null
-
-        if (!active || !modalRef.current.contains(active)) {
-          e.preventDefault()
-          ;(e.shiftKey ? last : first).focus()
-        } else if (e.shiftKey && (active === first || active === modalRef.current)) {
-          e.preventDefault()
-          last.focus()
-        } else if (!e.shiftKey && active === last) {
-          e.preventDefault()
-          first.focus()
-        }
-      }
-    }
-
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    window.addEventListener('keydown', onKey)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      if (prevOverflow) document.body.style.overflow = prevOverflow
-      else document.body.style.removeProperty('overflow')
-    }
-  }, [activeDeck])
+  const { modalRef, setTriggerEl } = useModalDialog({
+    open: activeDeck !== null,
+    onClose: closeModal,
+    onStepSlide: activeDeck && activeDeck.photos.length > 1 ? stepPhoto : undefined,
+    restoreFromActive: false,
+  })
 
   const openDeck = (idx: number, el?: HTMLElement | null) => {
     duelSfx.playHover()
-    triggerElRef.current = el ?? null
+    setTriggerEl(el ?? null)
     setActivePhotoIdx(0)
     setActiveDeckIdx(idx)
   }
@@ -299,7 +62,7 @@ export const AboutSection: React.FC = () => {
             aria-labelledby="life-deck-modal-title"
             onClick={() => {
               duelSfx.playHover()
-              setActiveDeckIdx(null)
+              closeModal()
             }}
             className="ygo-backdrop-in fixed inset-0 z-[80] flex items-center justify-center bg-black/72 p-3.5 backdrop-blur-sm sm:p-6"
           >
@@ -318,7 +81,7 @@ export const AboutSection: React.FC = () => {
                   type="button"
                   onClick={() => {
                     duelSfx.playHover()
-                    setActiveDeckIdx(null)
+                    closeModal()
                   }}
                   aria-label="Close deck details"
                   className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--text-main)]"
@@ -351,7 +114,7 @@ export const AboutSection: React.FC = () => {
                     type="button"
                     onClick={() => {
                       duelSfx.playHover()
-                      setActiveDeckIdx(null)
+                      closeModal()
                     }}
                     aria-label="Close deck details"
                     className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[2px] border border-[var(--border-subtle)] bg-[var(--bg-muted)] text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:text-[var(--text-main)]"
@@ -426,3 +189,5 @@ export const AboutSection: React.FC = () => {
     </div>
   )
 }
+
+export default AboutSection

@@ -34,8 +34,22 @@ const ST_SLOT_CARDS: Partial<Record<number, { src: string; label: string }>> = {
   4: { src: gatepassCard, label: 'Moriroku GatePass Counter Trap' },
 }
 
+const SPLASH_CARD_SRCS = [
+  adAstraCard,
+  lyndonCard,
+  adeCard,
+  angelicaCard,
+  buildbidCard,
+  insectraCard,
+  topcitCard,
+  hackforgovCard,
+  gatepassCard,
+  dostCard,
+]
+
 export const DuelFieldBg: React.FC<DuelFieldBgProps> = ({ variant = 'arena' }) => {
   const isSplash = variant === 'splash'
+  const [cardsReady, setCardsReady] = useState(0)
   const [isCompact, setIsCompact] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false
     return window.matchMedia('(max-width: 639px)').matches
@@ -49,6 +63,36 @@ export const DuelFieldBg: React.FC<DuelFieldBgProps> = ({ variant = 'arena' }) =
     mq.addEventListener('change', sync)
     return () => mq.removeEventListener('change', sync)
   }, [])
+
+  useEffect(() => {
+    if (!isSplash || typeof window === 'undefined') return
+    let cancelled = false
+    const preload = SPLASH_CARD_SRCS.map(
+      (src) =>
+        new Promise<void>((resolve) => {
+          const img = new window.Image()
+          img.decoding = 'sync'
+          img.src = src
+          if (typeof img.decode === 'function') {
+            void img
+              .decode()
+              .then(() => resolve())
+              .catch(() => resolve())
+          } else {
+            img.onload = () => resolve()
+            img.onerror = () => resolve()
+          }
+        }),
+    )
+    void Promise.all(preload).then(() => {
+      if (!cancelled) {
+        setCardsReady((n) => n + 1)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [isSplash])
 
   const slotW = isCompact ? 124 : 132
   const slotH = isCompact ? 166 : 182
@@ -110,6 +154,7 @@ export const DuelFieldBg: React.FC<DuelFieldBgProps> = ({ variant = 'arena' }) =
   return (
     <div
       aria-hidden="true"
+      data-cards-ready={isSplash ? (cardsReady > 0 ? 'true' : 'false') : undefined}
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
     >
       {/* Subtle Playmat Micro-Dot Grid */}

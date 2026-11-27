@@ -1,5 +1,5 @@
 import React from 'react'
-import { EXPERIENCE_HIGHLIGHTS, OJT_EXPERIENCE_PHOTOS } from '../data/deckData'
+import { EXPERIENCE_HIGHLIGHTS, OJT_EXPERIENCE_PHOTOS } from '../data'
 
 interface ExperienceSectionProps {
   onOpenCard: (cardId: string) => void
@@ -91,3 +91,5 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ onOpenCard
     </div>
   )
 }
+
+export default ExperienceSection

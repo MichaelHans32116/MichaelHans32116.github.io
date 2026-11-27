@@ -1,0 +1,244 @@
+@import "tailwindcss";
+
+:root,
+[data-theme="light"] {
+  --bg-canvas: #f6f4ee;
+  --bg-surface: #ffffff;
+  --bg-muted: #eeebe2;
+  --border-subtle: #dedad0;
+  --border-hover: #b8b1a2;
+  --text-main: #181a1f;
+  --text-secondary: #3f4551;
+  --text-muted: #555c68;
+  --accent-silver: #525e6e;
+  --accent-silver-bright: #94a3b8;
+  --accent-silver-glow: rgba(148, 163, 184, 0.36);
+  --zone-monster: rgba(120, 114, 98, 0.14);
+  --zone-st: rgba(120, 114, 98, 0.14);
+  --zone-field: rgba(100, 112, 129, 0.16);
+  --zone-deck: rgba(100, 112, 129, 0.22);
+  --splash-aura-1: rgba(120, 114, 98, 0.06);
+  --splash-aura-2: rgba(148, 163, 184, 0.14);
+  --logo-flame-top: #dc2626;
+  --logo-flame-mid: #b91c1c;
+  --logo-flame-dark: #5c0b12;
+  --logo-stroke: #161110;
+  --btn-primary-bg: #181a1f;
+  --btn-primary-text: #ffffff;
+  --card-shadow: 0 18px 40px -16px rgba(17, 24, 39, 0.24);
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'EB Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-ygo-title: 'Cinzel', Georgia, serif;
+  --font-ygo-body: 'EB Garamond', Georgia, serif;
+}
+
+[data-theme="dark"] {
+  --bg-canvas: #0b0e14;
+  --bg-surface: #121620;
+  --bg-muted: #181d29;
+  --border-subtle: #242b3a;
+  --border-hover: #3b455b;
+  --text-main: #eef0f5;
+  --text-secondary: #b6bfce;
+  --text-muted: #8f99ab;
+  --accent-silver: #cbd5e1;
+  --accent-silver-bright: #f1f5f9;
+  --accent-silver-glow: rgba(203, 213, 225, 0.34);
+  --zone-monster: rgba(148, 163, 184, 0.14);
+  --zone-st: rgba(148, 163, 184, 0.14);
+  --zone-field: rgba(203, 213, 225, 0.17);
+  --zone-deck: rgba(203, 213, 225, 0.22);
+  --splash-aura-1: rgba(148, 163, 184, 0.08);
+  --splash-aura-2: rgba(203, 213, 225, 0.11);
+  --logo-flame-top: #ef4444;
+  --logo-flame-mid: #b91c1c;
+  --logo-flame-dark: #450a0a;
+  --logo-stroke: #05070d;
+  --btn-primary-bg: #e2e8f0;
+  --btn-primary-text: #0b0e14;
+  --card-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.78);
+}
+
+@layer base {
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  html {
+    overflow-x: clip;
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+    background-color: var(--bg-canvas);
+    color: var(--text-main);
+  }
+
+  body {
+    overflow-x: clip;
+    background-color: var(--bg-canvas);
+    color: var(--text-main);
+    transition: background-color 220ms ease, color 220ms ease;
+  }
+}
+
+.font-mono-tech {
+  font-family: var(--font-mono);
+}
+
+.font-editorial {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+@keyframes ygoPhaseBannerSlash {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scaleX(0.92);
+  }
+  18% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+  78% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scaleX(0.97);
+  }
+}
+
+.ygo-phase-banner {
+  animation: ygoPhaseBannerSlash 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ygoBackdropIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.ygo-backdrop-in {
+  animation: ygoBackdropIn 200ms ease-out both;
+}
+
+@keyframes ygoModalSummon {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ygo-modal-summon {
+  animation: ygoModalSummon 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ygoMediaFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ygo-media-fade {
+  animation: ygoMediaFade 200ms ease-out both;
+}
+
+@keyframes ygoThemeStageFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  16% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  84% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.ygo-theme-flip-stage {
+  perspective: 1300px;
+  animation: ygoThemeStageFade 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes ygoFlipToDark {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(180deg);
+  }
+}
+
+@keyframes ygoFlipToLight {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(-180deg);
+  }
+}
+
+.ygo-flip-to-dark {
+  transform-style: preserve-3d;
+  animation: ygoFlipToDark 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ygo-flip-to-light {
+  transform-style: preserve-3d;
+  animation: ygoFlipToLight 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.duel-field-grid {
+  background-image:
+    radial-gradient(circle at 1px 1px, var(--border-subtle) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+.duel-field-perspective {
+  transform: perspective(1400px) rotateX(10deg);
+  transform-origin: center 55%;
+}
+
+.duel-field-perspective-mobile {
+  transform: perspective(1100px) rotateX(6deg);
+  transform-origin: center 54%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ygo-phase-banner,
+  .ygo-backdrop-in,
+  .ygo-modal-summon,
+  .ygo-media-fade,
+  .ygo-theme-flip-stage,
+  .ygo-flip-to-dark,
+  .ygo-flip-to-light {
+    animation: none !important;
+    transition: none !important;
+  }
+}

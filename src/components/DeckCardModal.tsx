@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Download, ExternalLink, Github, Lock, Smartphone, X } from 'lucide-react'
-import { DeckCardItem } from '../data/deckData'
-import { duelSfx } from '../utils/sfx'
+import { duelSfx } from '../audio'
+import { DeckCardItem } from '../data'
+import { useModalDialog } from '../hooks/useModalDialog'
 import { DeckCard } from './DeckCard'
 import { CarouselSlide, MediaCarousel } from './MediaCarousel'
 
@@ -11,37 +12,14 @@ interface DeckCardModalProps {
   onClose: () => void
 }
 
-const FOCUSABLE_SELECTOR =
-  'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-
 export const DeckCardModal: React.FC<DeckCardModalProps> = ({ item, onClose }) => {
   const [videoFailed, setVideoFailed] = useState(false)
   const [mediaIdx, setMediaIdx] = useState(0)
-  const modalRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLElement | null>(null)
-  const wasOpenRef = useRef(false)
 
   useEffect(() => {
     setVideoFailed(false)
     setMediaIdx(0)
   }, [item?.id])
-
-  useEffect(() => {
-    const isOpen = Boolean(item)
-    if (isOpen && !wasOpenRef.current) {
-      triggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
-      window.requestAnimationFrame(() => {
-        modalRef.current?.focus()
-      })
-    } else if (!isOpen && wasOpenRef.current) {
-      const trigger = triggerRef.current
-      triggerRef.current = null
-      if (trigger && trigger.isConnected) {
-        trigger.focus()
-      }
-    }
-    wasOpenRef.current = isOpen
-  }, [item])
 
   const mediaList: CarouselSlide[] = useMemo(() => {
     if (!item) return []
@@ -63,60 +41,19 @@ export const DeckCardModal: React.FC<DeckCardModalProps> = ({ item, onClose }) =
     return entries
   }, [item, videoFailed])
 
-  useEffect(() => {
-    if (!item) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault()
-        onClose()
-      } else if (e.key === 'ArrowLeft' && mediaList.length > 1) {
-        e.preventDefault()
-        duelSfx.playHover()
-        setMediaIdx((prev) => (prev - 1 + mediaList.length) % mediaList.length)
-      } else if (e.key === 'ArrowRight' && mediaList.length > 1) {
-        e.preventDefault()
-        duelSfx.playHover()
-        setMediaIdx((prev) => (prev + 1) % mediaList.length)
-      } else if (e.key === 'Tab' && modalRef.current) {
-        const focusables = Array.from(
-          modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-        ).filter((el) => el.offsetParent !== null || el === document.activeElement)
+  const stepSlide = useCallback(
+    (delta: -1 | 1) => {
+      if (mediaList.length <= 1) return
+      setMediaIdx((prev) => (prev + delta + mediaList.length) % mediaList.length)
+    },
+    [mediaList.length],
+  )
 
-        if (focusables.length === 0) {
-          e.preventDefault()
-          modalRef.current.focus()
-          return
-        }
-
-        const first = focusables[0]
-        const last = focusables[focusables.length - 1]
-        const active = document.activeElement as HTMLElement | null
-
-        if (!active || !modalRef.current.contains(active)) {
-          e.preventDefault()
-          ;(e.shiftKey ? last : first).focus()
-        } else if (e.shiftKey && (active === first || active === modalRef.current)) {
-          e.preventDefault()
-          last.focus()
-        } else if (!e.shiftKey && active === last) {
-          e.preventDefault()
-          first.focus()
-        }
-      }
-    }
-
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    window.addEventListener('keydown', onKey)
-    return () => {
-      if (prevOverflow) {
-        document.body.style.overflow = prevOverflow
-      } else {
-        document.body.style.removeProperty('overflow')
-      }
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [item, mediaList.length, onClose])
+  const { modalRef } = useModalDialog({
+    open: Boolean(item),
+    onClose,
+    onStepSlide: mediaList.length > 1 ? stepSlide : undefined,
+  })
 
   if (!item || typeof document === 'undefined') return null
 
@@ -258,3 +195,5 @@ export const DeckCardModal: React.FC<DeckCardModalProps> = ({ item, onClose }) =
     document.body,
   )
 }
+
+export default DeckCardModal

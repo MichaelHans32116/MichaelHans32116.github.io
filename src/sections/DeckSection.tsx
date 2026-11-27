@@ -2,14 +2,14 @@ import React from 'react'
 import { Download, ExternalLink, Github } from 'lucide-react'
 import { DeckCard } from '../components/DeckCard'
 import { DuelDeckBoxCard } from '../components/DuelDeckBoxCard'
+import { duelSfx } from '../audio'
 import {
   DECK_BOX_COVERS,
   DECK_CARDS,
   DeckCardItem,
   DeckCategory,
   SIDE_WORK_ARCHIVE,
-} from '../data/deckData'
-import { duelSfx } from '../utils/sfx'
+} from '../data'
 
 interface DeckSectionProps {
   deckFilter: DeckCategory
@@ -248,3 +248,5 @@ export const DeckSection: React.FC<DeckSectionProps> = ({
     </div>
   )
 }
+
+export default DeckSection

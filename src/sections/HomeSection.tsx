@@ -2,7 +2,7 @@ import React from 'react'
 import { FileDown, Github, Mail, Phone } from 'lucide-react'
 import { HoloYugiohCard } from '../components/HoloYugiohCard'
 import { TechToolkit } from '../components/TechToolkit'
-import { EDUCATION_INFO, PROFILE, STANDOUT_HIGHLIGHTS } from '../data/deckData'
+import { EDUCATION_INFO, PROFILE, STANDOUT_HIGHLIGHTS } from '../data'
 
 interface HomeSectionProps {
   onOpenCard: (cardId: string) => void
@@ -130,3 +130,5 @@ export const HomeSection: React.FC<HomeSectionProps> = ({ onOpenCard, onGoContac
     </div>
   )
 }
+
+export default HomeSection
